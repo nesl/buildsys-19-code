@@ -40,13 +40,12 @@ def register(deviceInfo):
     except IOError:
         with open(PATH, 'w+') as fh:
             pass
-
+    data = {}
     with open(PATH, 'r+') as fh:
         try:
             data = json.load(fh)
         except ValueError:
-            data = {}
-            # print("loading error")
+            print("loading error")
             # return -1
 
         print(data)
@@ -62,7 +61,6 @@ def register(deviceInfo):
             data['class'][deviceInfo.classSpect] = [lastId]
             data['uid'][str(lastId)] = addDevice(deviceInfo)
             data['last_id'] = lastId
-
         else:
             lastId = data['last_id']
             lastId = lastId + 1
@@ -71,18 +69,27 @@ def register(deviceInfo):
             data['last_id'] = lastId
         print("After! \n")
         pprint(data)
-        json.dump(data, fh)
+
+    if data.get('last_id') is not None:
+        with open(PATH, 'w+') as fh:
+            json.dump(data, fh)
         return data['last_id']
+    else:
+        # there are some feakin errors needed to be fixed.
+        return -1
 
 # remove a device. Each device could be registered more than once by different
 # services.
 def delete(uid):
     # Error checking.
+    uid = str(uid)
     try:
-        data = json.load(fh)
-    except ValueError:
+        with open(PATH, 'r+') as fh:
+            pass
+    except IOError:
         return -1
 
+    data ={}
     with open(PATH, 'r+') as fh:
         try:
             data = json.load(fh)
@@ -90,18 +97,27 @@ def delete(uid):
             print("loading error")
             return -1
 
-        print(data)
         if data.get('class') is None or data.get('uid') is None or data['uid'].get(uid) is None:
             return 1
 
         classSpect = data['uid'][uid]['classSpect']
         del data['uid'][uid]
         if data['class'].get(classSpect) is not None:
-            data['class'][classSpect].remove(uid)
+            data['class'][classSpect].remove(int(uid))
+            if len(data['class'][classSpect]) == 0:
+                del data['class'][classSpect]
+
         print("After! \n")
         print(data)
         json.dump(data, fh)
-    return 0
+
+    if data.get('last_id') is not None:
+        with open(PATH, 'w+') as fh:
+            json.dump(data, fh)
+        return 0
+    else:
+        # there are some feakin errors needed to be fixed.
+        return -1
 
 # Do NOT call this function. Testing purpose
 def _deleteAll():
@@ -131,6 +147,27 @@ def testRegister():
 
     print(str(uid1) + '\n' + str(uid2) + '\n' + str(uid3) + '\n')
 
+def _printJSON():
+    with open(PATH, 'r+') as fh:
+        print(json.load(fh))
+
+def testDelete():
+    testRegister()
+    print('\n\n\nTest Delete Start Here!\n\n')
+    _printJSON()
+    print(delete(3))
+    _printJSON()
+    print(delete(4))
+    _printJSON()
+    print(delete(1))
+    _printJSON()
+    device1 = DeviceInfo("0.0.0.0", "mic", "test", "room1", "aaa", "10")
+    device2 = DeviceInfo("1.1.1.1", "mic", "test", "room1", "bbb", "109")
+    uid1 = register(device1)
+    uid2 = register(device2)
+    _printJSON()
+
 if __name__ == "__main__":
     # print("What the fuck I am doing here!")
-    testRegister()
+    # testRegister()
+    testDelete()
