@@ -8,10 +8,16 @@ modalityAbstractionList = []
 serviceAbstractionList = []
 
 class DeviceAbstraction:
-    DeviceInfo = None
+    deviceInfo = None
     name = ''
     explicitDependency = []
     implicitDependency = []
+
+    def __init__(self, deviceInfo, name, explicitDependency):
+        self.deviceInfo = deviceInfo
+        self.name = name
+        self.explicitDependency = explicitDependency
+        self.implicitDependency = []
 
 
 class ModalityAbstraction:
@@ -19,11 +25,21 @@ class ModalityAbstraction:
     explicitDependency = []
     implicitDependency = []
 
+    def __init__(self, name, explicitDependency):
+        self.name = name
+        self.explicitDependency = explicitDependency
+        self.implicitDependency = []
+
 
 class ServiceAbstraction:
     name = ''
     explicitDependency = []
     implicitDependency = []
+
+    def __init__(self, name, explicitDependency):
+        self.name = name
+        self.explicitDependency = explicitDependency
+        self.implicitDependency = []
 
 
 def abstractionTypeDeterminer(type):
@@ -83,16 +99,16 @@ def clearDependency(name, abstractionList):
     for abstraction in abstractionList:
         if abstraction.name == name:
             for dependency in abstraction.explicitDependency:
-                if dependency is not in abstractionName:
+                if dependency not in abstractionName:
                     abstraction.explicitDependency.remove(dependency)
             for dependency in abstraction.implicitDependency:
-                if dependency is not in abstractionName:
+                if dependency not in abstractionName:
                     abstraction.implicitDependency.remove(dependency)
             return abstraction
     return None
 
 def getServices(name):
-    if name is not in abstractionName:
+    if name not in abstractionName:
         print('Name is not found. \nSent from getServices')
         return None
 
@@ -127,7 +143,71 @@ def updateExplicitDependency(abstraction, typeList):
     return -1
 
 
+##############################
+# Starting testing functions #
+##############################
+def clear():
+    deviceAbstractionList = []
+    abstractionName = []
+    modalityAbstractionList = []
+    serviceAbstractionList = []
 
+def testAddRegistration():
+    clear()
+    deviceAbstration1 = DeviceAbstraction('something', 'device1', [])
+    addAbstraction(deviceAbstration1)
+    if len(deviceAbstractionList) != 1:
+        print('fail add abstraction len1')
+        return 1
+    tmp = deviceAbstractionList[0]
+    if tmp.name != 'device1':
+        print('fail add abstraction name1')
+        return 2
+    deviceAbstration1 = DeviceAbstraction('something', 'device2', [])
+    addAbstraction(deviceAbstration1)
+    if len(deviceAbstractionList) != 2:
+        print('fail add abstraction len2')
+        return 3
+    tmp = deviceAbstractionList[1]
+    if tmp.name != 'device2':
+        print('fail add abstraction name2')
+        return 4
 
-if '__name__' == '__main__':
-    pass
+    modalityAbstraction = ModalityAbstraction('mod1', ['device1'])
+    addAbstraction(modalityAbstraction)
+    if len(modalityAbstractionList) != 1:
+        print('fail add abstraction mod1 len')
+        return 5
+    tmp = modalityAbstractionList[0]
+    if tmp.name != 'mod1' or tmp.explicitDependency[0] != 'device1':
+        print('fail add abstraction mod1 name')
+        return 6
+
+    serviceAbstraction = ServiceAbstraction('ser', ['device1', 'device2'])
+    addAbstraction(serviceAbstraction)
+    if len(serviceAbstractionList) != 1:
+        print('fail add abstraction ser len')
+        return 7
+    tmp = serviceAbstractionList[0]
+    if tmp.name != 'ser' or tmp.explicitDependency[1] != 'device2':
+        print('fail add abstraction ser name')
+        return 8
+
+    if abstractionName[0] != 'device1':
+        print('fail add abstraction abstraction name 0')
+        return 9
+    if abstractionName[1] != 'device2':
+        print('fail add abstraction abstraction name 1')
+        return 10
+    if abstractionName[2] != 'mod1':
+        print('fail add abstraction abstraction name 2')
+        return 11
+    if abstractionName[3] != 'ser':
+        print('fail add abstraction abstraction name 3')
+        return 12
+
+    print('pass add abstraction')
+    return 0
+
+if __name__ == '__main__':
+    print(testAddRegistration())
