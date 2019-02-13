@@ -1,18 +1,24 @@
 """
 The abstraction graph of the data structure.
 """
+abstractions = dict()
+#deviceAbstractionList = []
+#abstractionName = []
+#modalityAbstractionList = []
+#serviceAbstractionList = []
 
-deviceAbstractionList = []
-abstractionName = []
-modalityAbstractionList = []
-serviceAbstractionList = []
+class Abstraction:
+	name = ''
+	explicitDependency = []
+    implicitDependency = []
+    
+    @abstractmethod
+	def __init__(self,info, name, explicitDependency):
+		pass
 
 class DeviceAbstraction:
     deviceInfo = None
-    name = ''
-    explicitDependency = []
-    implicitDependency = []
-
+    
     def __init__(self, deviceInfo, name, explicitDependency):
         self.deviceInfo = deviceInfo
         self.name = name
@@ -21,27 +27,25 @@ class DeviceAbstraction:
 
 
 class ModalityAbstraction:
-    name = ''
-    explicitDependency = []
-    implicitDependency = []
+    modalityInfo = None
 
-    def __init__(self, name, explicitDependency):
+    def __init__(self, modalityInfo, name, explicitDependency):
+		self.modalityInfo = modalityInfo
         self.name = name
         self.explicitDependency = explicitDependency
         self.implicitDependency = []
 
 
 class ServiceAbstraction:
-    name = ''
-    explicitDependency = []
-    implicitDependency = []
-
-    def __init__(self, name, explicitDependency):
+    serviceInfo = None
+    
+    def __init__(self, serviceInfo, name, explicitDependency):
+        self.serviceInfo = serviceInfo
         self.name = name
         self.explicitDependency = explicitDependency
         self.implicitDependency = []
 
-
+'''
 def abstractionTypeDeterminer(type):
     if isinstance(type, DeviceAbstraction):
         return deviceAbstractionList
@@ -52,24 +56,26 @@ def abstractionTypeDeterminer(type):
     else:
         print('Error! Unknown type.')
         return None
+'''
 
 def addAbstraction(type):
-    if type.name in abstractionName:
+    if type.name in abstractions.keys():
         print('abstraction name is duplicated. Change one')
         return 1
-
+    '''
     if abstractionTypeDeterminer(type) is not None:
-        abstractionTypeDeterminer(type).append(type)
+        abstractions[type.name] = type
     else:
         print('error from AddAbstraction')
         return -1
-
+	'''
+	abstractions[type.name] = type
     updateImplicitDependency(type)
-    abstractionName.append(type.name)
+    #abstractionName.append(type.name)
     return 0
 
 def updateAbstraction(abstraction):
-    typeList = abstractionTypeDeterminer(abstraction)
+    #typeList = abstractionTypeDeterminer(abstraction)
 
     if type is not None:
         updateExplicitDependency(abstraction, typeList)
@@ -85,6 +91,7 @@ The dependencies rely on this should be updated at the runtime when accessing
 them.
 """
 def deleteAbstraction(abstraction):
+	'''
     type = abstractionTypeDeterminer(abstraction)
 
     if type is not None:
@@ -93,9 +100,22 @@ def deleteAbstraction(abstraction):
     else:
         print('error from DeleteAbstraction')
         return -1
+    '''
+    del abstractions[abstraction.name]
     return 0
 
 def clearDependency(name, abstractionList):
+	
+    for abstraction in abstractionList:
+        if abstraction.name == name:
+            for dependency in abstraction.explicitDependency:
+                if dependency not in abstractionName:
+                    abstraction.explicitDependency.remove(dependency)
+            for dependency in abstraction.implicitDependency:
+                if dependency not in abstractionName:
+                    abstraction.implicitDependency.remove(dependency)
+            return abstraction
+    
     for abstraction in abstractionList:
         if abstraction.name == name:
             for dependency in abstraction.explicitDependency:
