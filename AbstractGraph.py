@@ -1,3 +1,5 @@
+import abc
+
 """
 The abstraction graph of the data structure.
 """
@@ -10,13 +12,13 @@ abstractions = dict()
 class Abstraction:
 	name = ''
 	explicitDependency = []
-    implicitDependency = []
+	implicitDependency = []
     
-    @abstractmethod
+	@abc.abstractmethod
 	def __init__(self,info, name, explicitDependency):
 		pass
 
-class DeviceAbstraction:
+class DeviceAbstraction(Abstraction):
     deviceInfo = None
     
     def __init__(self, deviceInfo, name, explicitDependency):
@@ -26,17 +28,17 @@ class DeviceAbstraction:
         self.implicitDependency = []
 
 
-class ModalityAbstraction:
+class ModalityAbstraction(Abstraction):
     modalityInfo = None
 
     def __init__(self, modalityInfo, name, explicitDependency):
 		self.modalityInfo = modalityInfo
-        self.name = name
-        self.explicitDependency = explicitDependency
-        self.implicitDependency = []
+		self.name = name
+		self.explicitDependency = explicitDependency
+		self.implicitDependency = []
 
 
-class ServiceAbstraction:
+class ServiceAbstraction(Abstraction):
     serviceInfo = None
     
     def __init__(self, serviceInfo, name, explicitDependency):
@@ -59,27 +61,27 @@ def abstractionTypeDeterminer(type):
 '''
 
 def addAbstraction(type):
-    if type.name in abstractions.keys():
-        print('abstraction name is duplicated. Change one')
-        return 1
-    '''
+	if type.name in abstractions.keys():
+		print('abstraction name is duplicated. Change one')
+		return 1
+	abstractions[type.name] = type
+	updateImplicitDependency(type)
+    #abstractionName.append(type.name)
+	return 0
+	'''
     if abstractionTypeDeterminer(type) is not None:
         abstractions[type.name] = type
     else:
         print('error from AddAbstraction')
         return -1
 	'''
-	abstractions[type.name] = type
-    updateImplicitDependency(type)
-    #abstractionName.append(type.name)
-    return 0
 
-def updateAbstraction(abstraction):
-    #typeList = abstractionTypeDeterminer(abstraction)
 
-    if type is not None:
-        updateExplicitDependency(abstraction, typeList)
-        updateImplicitDependency(abstraction, typeList)
+def updateAbstraction(name):
+
+    if name in abstractions.keys():
+        updateExplicitDependency(abstraction)
+        updateImplicitDependency(abstraction)
     else:
         print('error from UpdateAbstraction')
         return -1
@@ -101,94 +103,71 @@ def deleteAbstraction(abstraction):
         print('error from DeleteAbstraction')
         return -1
     '''
-    del abstractions[abstraction.name]
-    return 0
-
-def clearDependency(name, abstractionList):
-	
-    for abstraction in abstractionList:
-        if abstraction.name == name:
-            for dependency in abstraction.explicitDependency:
-                if dependency not in abstractionName:
-                    abstraction.explicitDependency.remove(dependency)
-            for dependency in abstraction.implicitDependency:
-                if dependency not in abstractionName:
-                    abstraction.implicitDependency.remove(dependency)
-            return abstraction
+	del abstractions[abstraction.name]
+	return 0
     
-    for abstraction in abstractionList:
+'''
+Dependencies are only cleared when there is a service retrieval.
+'''
+def clearDependency(name):
+	
+    for abstraction in abstractions.keys():
         if abstraction.name == name:
             for dependency in abstraction.explicitDependency:
-                if dependency not in abstractionName:
+                if dependency not in abstractions.keys():
                     abstraction.explicitDependency.remove(dependency)
             for dependency in abstraction.implicitDependency:
-                if dependency not in abstractionName:
+                if dependency not in abstractions.keys():
                     abstraction.implicitDependency.remove(dependency)
             return abstraction
-    return None
-
-def getServices(name):
-    if name not in abstractionName:
-        print('Name is not found. \nSent from getServices')
-        return None
-
-    deviceAbstraction = clearDependency(name, deviceAbstractionList)
-    if deviceAbstraction is not None:
-        return deviceAbstraction
-
-    modalityAbstraction = clearDependency(name, modalityAbstractionList)
-    if modalityAbstraction is not None:
-        return modalityAbstraction
-
-    serviceAbstraction = clearDependency(name, serviceAbstractionList)
-    if serviceAbstraction is not None:
-        return serviceAbstraction
-
-    print('The name is in the abstractionName but not in any of the abstraction')
+            
+    print('The name is in the abstractions but not in any of the abstraction')
     print('\nError from getServices')
     return None
 
+'''
+This function will clear any null dependencies when returning a service.
+'''
+def getServices(name):
+ 
+    if name not in abstractions.keys():
+        print('Name is not found. \nSent from getServices')
+        return None        
+	return clearDependency(name)    
+    
 def updateImplicitDependency(abstraction):
     # TODO: update the implicit list of the abstraction
     return 0
 
-def updateExplicitDependency(abstraction, typeList):
-    for type in typeList:
-        if type.name == abstraction.name:
-            typeList.remove(type)
-            typeList.append(abstraction)
-            return 0
-
-    print('Error from updateExplicitDependency\n' + abstraction.name + 'not found!')
-    return -1
+def updateExplicitDependency(abstraction):
+	# TODO: change what updating an explicit dependency means.
+	return 0
 
 
 ##############################
 # Starting testing functions #
 ##############################
 def clear():
-    deviceAbstractionList = []
-    abstractionName = []
-    modalityAbstractionList = []
-    serviceAbstractionList = []
+    abstractions.clear()
 
 def testAddRegistration():
     clear()
     deviceAbstration1 = DeviceAbstraction('something', 'device1', [])
     addAbstraction(deviceAbstration1)
-    if len(deviceAbstractionList) != 1:
+    if len(abstractions) != 1:
         print('fail add abstraction len1')
         return 1
+    '''
     tmp = deviceAbstractionList[0]
     if tmp.name != 'device1':
         print('fail add abstraction name1')
         return 2
     deviceAbstration1 = DeviceAbstraction('something', 'device2', [])
     addAbstraction(deviceAbstration1)
-    if len(deviceAbstractionList) != 2:
+    if len(abstractions.keys()) != 2:
         print('fail add abstraction len2')
         return 3
-    tmp = deviceAbstractionList[1]
+    tmp = abstractions.keys()[1]
     if tmp.name != 'device2':
         print('fail add abstraction name2')
         return 4
@@ -225,7 +204,7 @@ def testAddRegistration():
     if abstractionName[3] != 'ser':
         print('fail add abstraction abstraction name 3')
         return 12
-
+	'''
     print('pass add abstraction')
     return 0
 
