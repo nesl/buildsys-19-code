@@ -18,7 +18,7 @@ class ServerHandler(socketserver.BaseRequestHandler):
         self.request.sendall(('I received your message. RL.').encode('utf-8'))
 
 if __name__ == '__main__':
-    HOST, PORT = 'localhost', 9999
+    HOST, PORT = '172.17.52.6', 9999
 
     # Create the server, binding to localhost on port 9999
     server = socketserver.TCPServer((HOST, PORT), ServerHandler)
