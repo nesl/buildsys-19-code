@@ -1,3 +1,5 @@
+import abc
+from typing import List,Set
 
 '''
     This time abstraction represents the a start and stop time for
@@ -54,7 +56,7 @@ class AbstractionSpecification:
     resolution: AbstractionResolution = None
     samplingRate: AbstractionSamplingRate = None
     
-    def __init__(self,effectiveRadius, resolution, samplingRate):
+    def __init__(self,effectiveRadius, resolution = None, samplingRate = None):
         self.effectiveRadius = effectiveRadius
         self.resolution = resolution
         self.samplingRate = samplingRate
@@ -71,16 +73,16 @@ class Abstraction:
     toop: OperationTimeInterval = None
     
     @abc.abstractmethod
-    def __init__(self, specs, name, childAbstractions, parentAbstractions):
+    def __init__(self, specs, name, childAbstractions = None, parentAbstractions = None):
         self.name = name
         self.specs = specs
-        self.childAbstractions : List[Abstraction] = childAbstractions
-        self.parentAbstractions: List[Abstraction] = parentAbstractions
+        self.childAbstractions : Set[Abstraction] = childAbstractions
+        self.parentAbstractions: Set[Abstraction] = parentAbstractions
 
-    def appendChildAbstraction(self,childAbstraction : Abstraction):
+    def appendChildAbstraction(self,childAbstraction):
         self.childAbstractions.append(childAbstraction)
 
-    def appendParentAbstraction(self,parentAbstraction : Abstraction):
+    def appendParentAbstraction(self,parentAbstraction):
         self.parentAbstractions.append(parentAbstraction)
 
     def setLocation(self, location: Location):
@@ -89,28 +91,47 @@ class Abstraction:
     def setTimeOfOperation(self, toop: OperationTimeInterval):
         self.toop = toop
 
+    def __hash__(self):
+        return hash(self.name)
+    
+    def __eq__(self, other):
+        return (self.__class__ == other.__class__ and self.name == other.name)
+
+    def __str__(self):
+        abstractionStr = "Abstraction Name: "+self.name
+        if self.childAbstractions is not None:
+            abstractionStr = abstractionStr + "\n"+"Children:\n"
+            for child in self.childAbstractions:
+                abstractionStr = abstractionStr + "\t -"+child.name+"\n"
+        if self.parentAbstractions is not None:
+            abstractionStr = "Parents:\n"
+            for parent in self.parentAbstractions:
+                abstractionStr= abstractionStr + "\t -"+parent.name+"\n"
+        return abstractionStr
+
 class DeviceAbstraction(Abstraction):
     
-    def __init__(self, specs, name, childAbstractions, parentAbstractions):
+    def __init__(self, specs, name, childAbstractions = None, parentAbstractions = None):
         self.name = name
         self.specs = specs
-        self.childAbstractions : List[Abstraction] = childAbstractions
-        self.parentAbstractions: List[Abstraction] = parentAbstractions
+        self.childAbstractions : Set[Abstraction] = childAbstractions
+        self.parentAbstractions: Set[Abstraction] = parentAbstractions
 
 
 class ModalityAbstraction(Abstraction):
     
-    def __init__(self, specs, name, childAbstractions, parentAbstractions):
+    def __init__(self, specs, name, childAbstractions = None, parentAbstractions = None):
         self.name = name
         self.specs = specs
-        self.childAbstractions : List[Abstraction] = childAbstractions
-        self.parentAbstractions: List[Abstraction] = parentAbstractions
+        self.childAbstractions : Set[Abstraction] = childAbstractions
+        self.parentAbstractions: Set[Abstraction] = parentAbstractions
 
 
 class ServiceAbstraction(Abstraction):
     
-    def __init__(self, specs, name, childAbstractions, parentAbstractions):
+    def __init__(self, specs, name, childAbstractions = None, parentAbstractions = None):
         self.name = name
         self.specs = specs
-        self.childAbstractions : List[Abstraction] = childAbstractions
-        self.parentAbstractions: List[Abstraction] = parentAbstractions
+        self.childAbstractions : Set[Abstraction] = childAbstractions
+        self.parentAbstractions: Set[Abstraction] = parentAbstractions
+

@@ -10,12 +10,12 @@
     G[abstraction1.toop.
 '''
 class SafetyRelation:
-    device1 = None
-    device2 = None
+    abstraction1 = None
+    abstraction2 = None
     rule = None
     def __init__(self, d1, d2, rule):
-        self.device1 = d1
-        self.device2 = d2
+        self.abstraction1 = d1
+        self.abstraction2 = d2
         self.rule = rule
 
 class SafetyEngine:
@@ -27,12 +27,12 @@ class SafetyEngine:
     def __init__(self, d1, d2, tConflict, rConflict):
         pass
     
-    def getRelationName(device1, device2):
-        return str(device1.id) + "to"+str(device2.id)
+    def getRelationName(self,device1, device2):
+        return str(device1.id) + "to" + str(device2.id)
     
-    def addSafetyRelation(safetyRelation):
-        relationName = getRelationName(safetyRelation.device1, safetyRelation.device2)
-        safetyRules[relationName] = safetyRelation
+    def addSafetyRelation(self, safetyRelation):
+        relationName = self.getRelationName(safetyRelation.device1, safetyRelation.device2)
+        self.safetyRules[relationName] = safetyRelation
 
     # To be used when a device is unregistered from the system:
     def removeSafetyRelationsForDevice(device):
