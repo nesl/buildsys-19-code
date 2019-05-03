@@ -1,0 +1,3 @@
+'''
+    Detect the conflicts.
+'''

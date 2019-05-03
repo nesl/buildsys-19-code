@@ -3,28 +3,6 @@ import os
 from pprint import pprint
 PATH = '/tmp/devices'
 
-'''
-This time abstraction represents the a start and stop time for 
-a device's operation. A device can have multiple instances of time 
-operation.
-'''
-class OperationTimeInterval:
-	start_time = None
-	end_time = None
-	def __init__(self, st, et):
-		self.start_time = st
-		self.end_time = et
-		
-'''
-This class will represent the location of a device. For now, we will
-work in 2 dimensions.
-'''
-class EffectiveRange:
-	locationX = None
-	locationY = None
-	radius = 0.0
-	def __init__(self, 
-
 class DeviceInfo:
     ip = ""
     classSpect = ""
@@ -47,13 +25,13 @@ class DeviceInfo:
 
     def assignID(self, id):
         self.id = id
-	
+
 	def addTOOP(time):
 		self.toops.append(time)
 
 	def addRange(range):
 		self.effectiveRanges.append(range)
-	
+
 # add the device information to JSON specs
 def addDevice(addInfo):
     temp = {"ip": addInfo.ip, "classSpect": addInfo.classSpect, "descrpt":
