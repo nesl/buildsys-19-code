@@ -2,6 +2,9 @@ import abc
 from typing import List,Set
 import sys
 
+SENSING = 0
+ACTUATION = 1
+
 '''
     Abstraction classes:
 '''
@@ -13,10 +16,20 @@ class Abstraction:
     moduleName = ''
     childDeviceInstance = set() # DeviceInstance Set
     range = set()
+    state = None
+    type = -1
 
-    def __init__(self, name, moduleName):
+    def __init__(self, name, moduleName, initState, type):
         self.moduleName = moduleNname
         self.name = name
+        self.state = initState
+        self.type = type
+
+    def setState(self, state):
+        self.state = state
+
+    def getState(self):
+        return self.state
 
     def updateCost(self, cost):
         self.cost = cost
@@ -66,7 +79,7 @@ class DeviceInstance:
         self.name = name
         self.status = status # On or OFF. Or discrete value.
         self.parentAbstractions: Set[Abstraction] = parentAbstractions
-        self.range = set()
+        self.range = ''
 
     # Range is the string
     def tagRange(self, range):
