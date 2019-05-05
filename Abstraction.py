@@ -1,6 +1,7 @@
 import abc
 from typing import List,Set
 import sys
+from SpecParser import DeviceInfo
 
 SENSING = 0
 ACTUATION = 1
@@ -10,8 +11,8 @@ ACTUATION = 1
 '''
 class Abstraction:
     name = ''
-    childAbstractions = set() # Abstraction Set
-    parentAbstractions = set() # Abstraction Set
+    childAbstractions = set() # Abstraction Set using the name of string
+    parentAbstractions = set() # Abstraction Set using the name of string
     cost = sys.maxInt
     moduleName = ''
     childDeviceInstance = set() # DeviceInstance Set
@@ -74,17 +75,13 @@ class Abstraction:
 
 
 class DeviceInstance:
+    name = ''
+    satus = None
+    parentAbstractions = None
+    deviceInfo = None
 
-    def __init__(self, status, name, range = None, parentAbstractions = None):
+    def __init__(self, status, name, deviceInfo, parentAbstractions = None):
         self.name = name
         self.status = status # On or OFF. Or discrete value.
         self.parentAbstractions: Set[Abstraction] = parentAbstractions
-        self.range = ''
-
-    # Range is the string
-    def tagRange(self, range):
-        self.range.append(range)
-
-    # Range is the string
-    def removeRange(self, range):
-        self.range.remove(range)
+        self.deviceInfo = deviceInfo
