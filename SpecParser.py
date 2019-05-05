@@ -10,8 +10,6 @@ class DeviceInfo:
     location = ""
     mac = ""
     id = -1
-    toops = []
-    effectiveRanges = []
 
 	#Initially we will only allow initialization with a single range and toop.
     def __init__(self, ip, classSpect, descrpt, location, mac, range, toop):
@@ -20,8 +18,6 @@ class DeviceInfo:
         self.descrpt = descrpt
         self.location = location
         self.mac = mac
-        self.effectiveRanges.append(range)
-        self.toops.append(toop)
 
     def assignID(self, id):
         self.id = id
