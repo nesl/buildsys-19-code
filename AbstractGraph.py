@@ -1,13 +1,14 @@
 import abc
 from Abstraction import *
 from typing import List
+from ModuleSpecParser import Module
 
 """
     The abstraction graph of the data structure.
 """
-class AbstractGraph:
+class ActuationGraph:
 
-    abstractions: List[Abstraction] = dict()
+    modules: List[Module] = dict()
     devices: List[DeviceInstance] = dict()
 
     def __init__ (self):
@@ -19,11 +20,11 @@ class AbstractGraph:
         We can imagine an interface where the control system developer can select which
         abstractions are parents/children and pass the names (IDs)  to this function accordingly.
     '''
-    def addAbstraction(self, name, abstraction):
-        if abstraction.name in self.abstractions.keys():
+    def addAbstraction(self, name, module):
+        if module.name in self.modules.keys():
             print('abstraction name is duplicated. Change one')
             return 1
-        self.abstractions[abstraction.name] = abstraction
+        self.modules[module.name] = module
         return 0
 
     """
@@ -31,8 +32,8 @@ class AbstractGraph:
         The dependencies rely on this should be updated at the runtime when accessing
         them.
     """
-    def deleteAbstraction(self,abstraction):
-        del self.abstractions[abstraction.name]
+    def deleteAbstraction(self, module):
+        del self.modules[module.name]
         return 0
 
     def addDeviceInstance(self, deviceInstance):

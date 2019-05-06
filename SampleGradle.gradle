@@ -1,0 +1,15 @@
+parameter {
+  type = "actuation",
+  name = "AC-cooling-down",
+}
+
+input {
+  module = "cooling-down",
+  dependency {
+    "remediot.actuation.AC_instance",
+  },
+}
+
+output {
+  None,
+}
