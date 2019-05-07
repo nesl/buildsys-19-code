@@ -19,6 +19,7 @@ class Abstraction:
     range = set()
     state = None
     type = -1
+    busy = False
 
     def __init__(self, name, moduleName, initState, type):
         self.moduleName = moduleNname
@@ -34,6 +35,19 @@ class Abstraction:
 
     def updateCost(self, cost):
         self.cost = cost
+
+    def isBusy(self):
+        return self.busy
+
+    def setUsing(self):
+        self.busy = True
+
+    def releaseUsing(self):
+        self.busy = False
+
+    # This function needs to be overwritten by the child class
+    def performFunc(self, *args):
+        return
 
     def addRange(self, range):
         if range in self.range:

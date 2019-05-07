@@ -20,7 +20,7 @@ class ActuationGraph:
         We can imagine an interface where the control system developer can select which
         abstractions are parents/children and pass the names (IDs)  to this function accordingly.
     '''
-    def addAbstraction(self, name, module):
+    def addAbstraction(self, module):
         if module.name in self.modules.keys():
             print('abstraction name is duplicated. Change one')
             return 1
