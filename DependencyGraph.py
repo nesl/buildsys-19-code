@@ -1,5 +1,5 @@
 from IFTTTParsing import ConditionStruct, IFTTTParser
-
+import numpy as np
 
 class GraphNode:
     def __init__(self, x: list): # x should be a list contains "ConditionStruct"
@@ -194,6 +194,57 @@ class DependencyGraph:
                 if restart:
                     break  # break from for start_node in self.nodes
         return loop_link_list
+
+    def find_shortest_path(self, a: GraphNode, b: GraphNode):
+        trace_back = list(np.zeros(len(self.nodes)))
+        topology_depth = list(np.zeros(len(self.nodes)))
+        shortest_path = []
+
+        # start a BFS
+        trace_back[self.nodes.index(a)] = 0
+        current_depth = 1
+        visited, queue = [], [a]
+        found_dest = False
+        while len(queue):
+            current_node = queue[0]
+            if current_node not in visited:
+                visited.append(current_node)  # mark this vertex as visited
+            for each in current_node.outward_link:
+
+                if each == b:
+                    # We have found a trail leading to the destination in the graph
+                    found_dest = True
+                    queue.append(b)
+                    trace_back[self.nodes.index(b)] = current_node
+                    topology_depth[self.nodes.index(b)] = current_depth
+                    break  # break from for each in current_node.outward_link
+
+                else:
+                    if each not in visited:
+                        queue.append(each)
+                        trace_back[self.nodes.index(each)] = current_node
+                        topology_depth[self.nodes.index(each)] = current_depth
+
+            queue.pop(0)  # dequeue the current_node
+            if found_dest:
+                break  # break from while
+        if len(queue) == 0:
+            found_dest = False
+
+        # Next step: Trace back from b to a and same the links along the way in a list
+        # In the future, if you want to pop out the conflicted rule from the list, then change here(add remove)
+        if found_dest:
+            dest_node = b
+            source_node =  None
+            shortest_path = [b]
+            while source_node != a:
+                source_node = trace_back.index(dest_node)
+                shortest_path.append(source_node)
+                dest_node = source_node
+
+        return found_dest, shortest_path.reverse
+
+
 
 
 if __name__ == '__main__':
