@@ -13,7 +13,7 @@ class Abstraction:
     name = ''
     childAbstractions = set() # Abstraction Set using the name of string
     parentAbstractions = set() # Abstraction Set using the name of string
-    cost = sys.maxInt
+    cost = sys.maxsize
     moduleName = ''
     childDeviceInstance = set() # DeviceInstance Set
     range = set()
@@ -22,7 +22,7 @@ class Abstraction:
     busy = False
 
     def __init__(self, name, moduleName, initState, type):
-        self.moduleName = moduleNname
+        self.moduleName = moduleName
         self.name = name
         self.state = initState
         self.type = type
@@ -53,7 +53,7 @@ class Abstraction:
         if range in self.range:
             return
         # range is the string
-        self.range.append(range)
+        self.range.add(range)
         for abs in childAbstraction:
             abs.addRange(range)
 
@@ -61,13 +61,13 @@ class Abstraction:
             device.tagRange(range)
 
     def appendChildDeviceInstance(self, childDeviceInstance):
-        self.childDeviceInstance.append(childDeviceInstance)
+        self.childDeviceInstance.add(childDeviceInstance)
 
     def appendChildAbstraction(self,childAbstraction):
-        self.childAbstractions.append(childAbstraction)
+        self.childAbstractions.add(childAbstraction)
 
     def appendParentAbstraction(self,parentAbstraction):
-        self.parentAbstractions.append(parentAbstraction)
+        self.parentAbstractions.add(parentAbstraction)
 
     def __hash__(self):
         return hash(self.name)
@@ -91,11 +91,16 @@ class Abstraction:
 class DeviceInstance:
     name = ''
     satus = None
-    parentAbstractions = None
+    parentAbstractions = set()
     deviceInfo = None
 
-    def __init__(self, status, name, deviceInfo, parentAbstractions = None):
+    def __init__(self, status, name, deviceInfo):
         self.name = name
         self.status = status # On or OFF. Or discrete value.
-        self.parentAbstractions: Set[Abstraction] = parentAbstractions
         self.deviceInfo = deviceInfo
+
+    def addParentsInfo(self, parentAbstraction):
+        self.parentAbstractions.add(parentAbstraction)
+
+    def removeParentsInfo(self, parentAbstraction):
+        self.parentAbstractions.remove(parentAbstraction)

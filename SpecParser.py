@@ -12,7 +12,7 @@ class DeviceInfo:
     id = -1
 
 	#Initially we will only allow initialization with a single range and toop.
-    def __init__(self, ip, classSpect, descrpt, location, mac, range, toop):
+    def __init__(self, ip, classSpect, descrpt, location, mac):
         self.ip = ip
         self.classSpect = classSpect
         self.descrpt = descrpt
@@ -21,12 +21,6 @@ class DeviceInfo:
 
     def assignID(self, id):
         self.id = id
-
-	def addTOOP(time):
-		self.toops.append(time)
-
-	def addRange(range):
-		self.effectiveRanges.append(range)
 
 # add the device information to JSON specs
 def addDevice(addInfo):

@@ -2,6 +2,10 @@ import abc
 from Abstraction import *
 from typing import List
 from ModuleSpecParser import Module
+from pprint import pprint
+
+SENSING = 0
+ACTUATION = 1
 
 """
     The abstraction graph of the data structure.
@@ -52,17 +56,34 @@ class ActuationGraph:
         self.abstractions.clear()
 
 
-def testAddChildrenAndParents():
-    graph = AbstractGraph()
-    device1 = DeviceAbstraction(AbstractionSpecification(10.0, 100, 100,), "Device1")
-    graph.addAbstraction(device1)
-    device2 = DeviceAbstraction(AbstractionSpecification(11.0, 100, 100,), "Device2")
-    graph.addAbstraction(device2, ["Device1"])
-    device3 = DeviceAbstraction(AbstractionSpecification(12.0, 100, 100,), "Device3")
-    graph.addAbstraction(device3, None, ["Device2"])
-    print("Device1: \n***********\n", device1)
-    print("\nDevice2: \n***********\n", device2)
-    print("\nDevice3: \n***********\n", device3)
+def testAddChildren():
+    class HvacDevice(DeviceInstance):
+        def __init__(self):
+            deviceInfo = DeviceInfo("null", "null", "null", "null", "null")
+            DeviceInstance.__init__(self, True, 'This is HVAC instance', deviceInfo)
+
+    class HvacAbstraction(Abstraction):
+        def __init__(self):
+            Abstraction.__init__(self, 'turn-on-hvac', 'cooling-down', 0, ACTUATION)
+            hvacDevice = HvacDevice()
+            super(HvacAbstraction, self).appendChildDeviceInstance(hvacDevice)
+
+        def performFunc(self, *args):
+            print('I am turning on HVAC')
+
+    graph = ActuationGraph()
+    hvacAbs = HvacAbstraction()
+    graph.addAbstraction(hvacAbs)
+    pprint(graph.modules)
+    # device1 = DeviceAbstraction(AbstractionSpecification(10.0, 100, 100,), "Device1")
+    # graph.addAbstraction(device1)
+    # device2 = DeviceAbstraction(AbstractionSpecification(11.0, 100, 100,), "Device2")
+    # graph.addAbstraction(device2, ["Device1"])
+    # device3 = DeviceAbstraction(AbstractionSpecification(12.0, 100, 100,), "Device3")
+    # graph.addAbstraction(device3, None, ["Device2"])
+    # print("Device1: \n***********\n", device1)
+    # print("\nDevice2: \n***********\n", device2)
+    # print("\nDevice3: \n***********\n", device3)
 
 
 if __name__ == "__main__":
