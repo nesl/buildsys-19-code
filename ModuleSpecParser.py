@@ -21,6 +21,9 @@ class Module:
     def callFunc(self, name, *args):
         self.abstractions[name].performFunc(*args)
 
+    def getAbstractionList(self):
+        return abstractions
+
 def testModuleSpectSheet():
     #TODO: Add the test function here.
     return

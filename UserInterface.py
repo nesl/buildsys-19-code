@@ -48,12 +48,12 @@ def selectIntention(intentions):
             messagebox.showerror('No Selected','Error! Please select your intention.')
             return
         window.destroy()
-        # TODO: Get the real display instead
-        if var.get() == 'cool down':
-            displayRemedialActions(samplePossibleRemediation())
+
+        return var.get()
 
     def cancelClicked():
         window.destroy()
+        return None
 
     def radioChoice():
         print("You selected " + var.get())
@@ -70,7 +70,9 @@ def samplePossibleRemediation():
 
 def testUI():
     intentions = ['cool down', 'ventilization']
-    selectIntention(intentions)
+    selected = selectIntention(intentions)
+    if selected == 'cool down':
+        displayRemedialActions(samplePossibleRemediation())
 
 if __name__ == '__main__':
     testUI()

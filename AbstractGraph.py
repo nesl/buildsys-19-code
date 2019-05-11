@@ -47,13 +47,8 @@ class ActuationGraph:
 
         self.devices[deviceInstance.name] = deviceInstance
 
-    def getAbstractionList(self):
-        return self.abstractions
-    ##############################
-    # Starting testing functions #
-    ##############################
-    def clear(self):
-        self.abstractions.clear()
+    def getModuleList(self):
+        return self.modules
 
 
 def testAddChildren():
