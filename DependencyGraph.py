@@ -27,6 +27,9 @@ def is_compatible_or_identical(a: GraphNode, b: GraphNode, is_source_node=True):
                     # for conditions, they can be satisfied at the same time -> compatible
                     # for actions, they can be performed at the same time -> compatible
                     is_identical = False
+                    if each_a.value > each_b.value:
+                        is_compatible = False
+                        return is_compatible, is_identical
                 if each_a.operator == '=' and each_b.operator == '=':
                     # a,b are both commands
                     # if a.val != b.val, then they are certainly non-compatible
@@ -39,6 +42,9 @@ def is_compatible_or_identical(a: GraphNode, b: GraphNode, is_source_node=True):
                     # for conditions, they can be satisfied at the same time -> compatible
                     # for actions, they can be performed at the same time -> compatible
                     is_identical = False
+                    if each_a.value < each_b.value:
+                        is_compatible = False
+                        return is_compatible, is_identical
                 if each_a.operator == '>=' and each_b.operator == '>=':
                     # a,b are both numerical
                     # as conditions, they can be satisfied together -> compatible
@@ -54,6 +60,9 @@ def is_compatible_or_identical(a: GraphNode, b: GraphNode, is_source_node=True):
                     # for conditions, they can be satisfied at the same time -> compatible
                     # for actions, they can be performed at the same time -> compatible
                     is_identical = False
+                    if each_a.value < each_b.value:
+                        is_compatible = False
+                        return is_compatible, is_identical
                 if each_a.operator == '<=' and each_b.operator == '>=':
                     # a,b are both numerical
                     # if a.val > b.val, they can be satisfied together -> compatible, otherwise non-compatible
@@ -71,6 +80,9 @@ def is_compatible_or_identical(a: GraphNode, b: GraphNode, is_source_node=True):
                     # for conditions, they can be satisfied at the same time -> compatible
                     # for actions, they can be performed at the same time -> compatible
                     is_identical = False
+                    if each_a.value > each_b.value:
+                        is_compatible = False
+                        return is_compatible, is_identical
                 if each_a.operator == '<=' and each_b.operator == '<=':
                     # a,b are both numerical
                     # as conditions, they can be satisfied together -> compatible
@@ -101,6 +113,10 @@ class DependencyGraph:
         source_node = GraphNode(new_link[0])
         dest_node = GraphNode(new_link[1])
 
+        compatible_condtions_list = []
+        uncompatible_actions_list = []
+
+
         # Compare source node with existing nodes
         # if any of the existing nodes is compatible with source node, then there's a potential of conflict
         source_is_compatible = False
@@ -109,9 +125,11 @@ class DependencyGraph:
             is_compatible, is_identical = is_compatible_or_identical(source_node, node)
             if is_compatible:
                 source_is_compatible = True
+                compatible_condtions_list.append(node)
             if is_identical:
                 source_is_identical = True
                 source_node = node
+                compatible_condtions_list.append(node)
 
         # Compare dest node with existing nodes
         # if any of the existing nodes does not agree with destination node, then there's a potential of conflict
@@ -121,15 +139,36 @@ class DependencyGraph:
             is_compatible, is_identical = is_compatible_or_identical(dest_node, node, is_source_node=False)
             if not is_compatible:
                 dest_is_compatible = False
+                uncompatible_actions_list.append(node)
             if is_identical:
                 dest_is_identical = True
                 dest_node = node
 
         # If source_node is compatible, which means the new condition will happen along with existing conditions
         # and meanwhile, dest_node is not compatible, which suggest the new action may counteract with others
-        # In this case, this IFTTT rule need to be revised
-        if source_is_compatible and not dest_is_compatible:
-            return new_link  # send the tuple for processing
+        # In this case, we list all the existing compatible condtions C and uncompatible actions A
+        # Run a search, if there exist a route in graph from c in C to a in A, the new rule need to be revised
+
+        pop_out_from_graph = []
+        # pop_out_from_graph is a list, each element of which is a list containing tuples of conflict_links
+        # e.g result[i] = [(ConditionStruct1, Condition_Struct2), (ConditionStruct3, Condition_Struct4)] is one link
+
+
+        new_rule_is_valid = True
+        for compatible_condtion in compatible_condtions_list:
+            for uncompatible_action in uncompatible_actions_list:
+                found_route, shortest_path = self.find_shortest_path(compatible_condtion, uncompatible_action)
+                if found_route:
+                    new_rule_is_valid = False
+                    pop_out_from_graph.append([])
+                    for i in range(0, len(shortest_path)):
+                        pop_out_from_graph[-1].append(self.remove(shortest_path[i], shortest_path[i + 1]))
+                    # pop all links in current conflict chain
+
+        if not new_rule_is_valid:
+            pop_out_from_graph.append([])
+            pop_out_from_graph[-1].append(new_link)
+            return pop_out_from_graph  # send the tuple for processing
         else:
             if not source_is_identical:
                 self.nodes.append(source_node)
@@ -157,7 +196,7 @@ class DependencyGraph:
         loop_link_list = []
         searched_for_loop = []  # Save the nodes that has already been search for loops
         has_loop = True
-        while has_loop:
+        while has_loop and len(self.nodes):
             for start_node in self.nodes:  # Traverse all nodes in the graph, search for loops containing this node
                 restart = False  # if restart == True, then a loop is found and removed, we break all loops and restart
 
@@ -177,6 +216,7 @@ class DependencyGraph:
                             loop_link_list.append([])
                             for i in range(loop_start_index , len(stack)-1):
                                 loop_link_list[-1].append(self.remove(stack[i],stack[i+1]))
+                            loop_link_list[-1].append(self.remove(stack[i+1], stack[loop_start_index]))
                                 # pop all links in the loop
                             restart = True
                             break  # break from for each in current_node.outward_link
@@ -238,20 +278,81 @@ class DependencyGraph:
             source_node =  None
             shortest_path = [b]
             while source_node != a:
-                source_node = trace_back.index(dest_node)
+                source_node = trace_back[self.nodes.index(dest_node)]
                 shortest_path.append(source_node)
                 dest_node = source_node
 
         return found_dest, shortest_path.reverse
 
 
+    def DFS(self, a: GraphNode):
+        visited, stack = [], [a]
+        while len(stack):
+            curr_node = stack[-1]
+            if curr_node not in visited:
+                visited.append(curr_node)
+            for each in curr_node.outward_link:
+                has_unvisited_child = False
+                if each not in visited:
+                    stack.append(each)
+                    has_unvisited_child = True  # push one of the outward nodes in stack
+                    break
+            if not has_unvisited_child:
+                stack.pop()
+        return visited
+
+
+
+
+    def graph_check_forward(self):
+        pop_out_from_graph = []
+
+        for curr_node in self.nodes:
+            compatible_conditions_list = []
+            for node in self.nodes:
+                is_compatible, is_identical = is_compatible_or_identical(curr_node, node, is_source_node=True)
+                if is_compatible or is_identical:
+                    compatible_conditions_list.append(node)
+            # find all compatible condition nodes
+
+            for compat_node in compatible_conditions_list:
+                curr_node_desendents = self.DFS(curr_node)
+                compat_node_desendents = self.DFS(compat_node)
+
+                is_compatible = True
+
+                for i in range(0, len(curr_node_desendents)):
+                    if not is_compatible:
+                        break
+                    for j in range(0, len(compat_node_desendents)):
+                        is_compatible, _ = is_compatible_or_identical(curr_node_desendents[i],
+                                                                      compat_node_desendents[j], is_source_node=False)
+                        if not is_compatible:
+                            break
+
+                if not is_compatible:
+                    pop_out_from_graph.append([])
+                    for k in range(0, i):
+                        pop_out_from_graph[-1].append(self.remove(curr_node_desendents[k], curr_node_desendents[k + 1]))
+                    pop_out_from_graph.append([])
+                    for k in range(0, j):
+                        pop_out_from_graph[-1].append(self.remove(compat_node_desendents[k], compat_node_desendents[k + 1]))
+
+        return pop_out_from_graph
+
+
+    def graph_check_backward(self):
+        pass
+
 
 
 if __name__ == '__main__':
-    strings = [ # "if temperature.val >= 70 then air_conditioner.state = 1 ",
-               "if temperature.val <= 69 then air_conditioner.state = 0 ",
-               "if air_conditioner.state = 0 then humidifier.state = 1 ",
-               "if humidifier.state = 1 and temperature.val >= 70 and air_conditioner.state = 1 then air_conditioner.state = 0"]
+    strings = [ "if temperature.val >= 70 then air_conditioner.state = 1 ",
+                "if air_conditioner.state = 1 then humidifier.state = 1",
+                "if humidity.val <= 70 and temperature.val <= 69 then air_conditioner.state = 0"]
+               # "if temperature.val <= 69 then air_conditioner.state = 0 ",
+               # "if air_conditioner.state = 0 then humidifier.state = 1 ",
+               # "if humidifier.state = 1 and temperature.val >= 70 and air_conditioner.state = 1 then air_conditioner.state = 0"]
 
     valid_abstract = {"temperature": ["val"], "air_conditioner": ["state"],
                       "humidity": ["val"], "humidifier": ["state"]}
@@ -263,8 +364,8 @@ if __name__ == '__main__':
             rule_collector.append(rule_tuple)
     for each in rule_collector:
         popped_out = test_graph.add(each)
-    test_graph.nodes[2].outward_link.append(test_graph.nodes[3])  # Force a link to form a loop
-    test_graph.nodes[3].inward_link.append(test_graph.nodes[2])
+    # test_graph.nodes[2].outward_link.append(test_graph.nodes[3])  # Force a link to form a loop
+    # test_graph.nodes[3].inward_link.append(test_graph.nodes[2])
     result = test_graph.find_loop()
     print("Done")
 
