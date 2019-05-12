@@ -17,12 +17,14 @@ class Module:
 
     def addAbstraction(self, abstraction):
         self.abstractions[abstraction.name] = abstraction
+        for instance in abstraction.childDeviceInstance:
+            instance.addParentsInfo(self.name)
 
     def callFunc(self, name, *args):
         self.abstractions[name].performFunc(*args)
 
     def getAbstractionList(self):
-        return abstractions
+        return self.abstractions
 
 def testModuleSpectSheet():
     #TODO: Add the test function here.

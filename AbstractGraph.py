@@ -24,11 +24,19 @@ class ActuationGraph:
         We can imagine an interface where the control system developer can select which
         abstractions are parents/children and pass the names (IDs)  to this function accordingly.
     '''
-    def addAbstraction(self, module):
+    def addModule(self, module):
         if module.name in self.modules.keys():
             print('abstraction name is duplicated. Change one')
             return 1
         self.modules[module.name] = module
+        if module.getAbstractionList():
+            for name, abs in module.getAbstractionList().items():
+                if not abs.childDeviceInstance:
+                    continue
+
+                for deviceInstance in abs.childDeviceInstance:
+                    self.devices[deviceInstance.name] = deviceInstance
+
         return 0
 
     """
@@ -47,9 +55,14 @@ class ActuationGraph:
 
         self.devices[deviceInstance.name] = deviceInstance
 
+    def getModule(self, name):
+        return self.modules[name]
+
     def getModuleList(self):
         return self.modules
 
+    def getDeviceInstance(self, name):
+        return self.devices[name]
 
 def testAddChildren():
     class HvacDevice(DeviceInstance):

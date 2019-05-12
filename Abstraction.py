@@ -99,8 +99,8 @@ class DeviceInstance:
         self.status = status # On or OFF. Or discrete value.
         self.deviceInfo = deviceInfo
 
-    def addParentsInfo(self, parentAbstraction):
-        self.parentAbstractions.add(parentAbstraction)
+    def addParentsInfo(self, parentModule):
+        self.parentAbstractions.add(parentModule)
 
-    def removeParentsInfo(self, parentAbstraction):
-        self.parentAbstractions.remove(parentAbstraction)
+    def removeParentsInfo(self, parentModule):
+        self.parentAbstractions.remove(parentModule)

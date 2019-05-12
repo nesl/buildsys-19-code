@@ -18,7 +18,6 @@ def displayRemedialActions(actions):
             return
         messagebox.showinfo('Remedial Action Selected', 'We will do ' + var.get().upper() + ' instead. Goodbye!')
         window.destroy()
-        return var.get()
 
     def radioChoice():
         print("You selected " + var.get())
@@ -32,6 +31,7 @@ def displayRemedialActions(actions):
     Button(window, text="OKAY", command=okayClicked).pack(side=LEFT, expand=True, fill='both')
     Button(window, text="CANCEL", command=cancelClicked).pack(side=RIGHT, expand=True, fill='both')
     window.mainloop()
+    return var.get()
 
 
 def selectIntention(intentions):
@@ -49,11 +49,8 @@ def selectIntention(intentions):
             return
         window.destroy()
 
-        return var.get()
-
     def cancelClicked():
         window.destroy()
-        return None
 
     def radioChoice():
         print("You selected " + var.get())
@@ -64,14 +61,15 @@ def selectIntention(intentions):
     Button(window, text="OKAY", command=okayClicked).pack(side=LEFT, expand=True, fill='both')
     Button(window, text="CANCEL", command=cancelClicked).pack(side=RIGHT, expand=True, fill='both')
     window.mainloop()
+    return var.get()
 
 def samplePossibleRemediation():
     return ['turn on AC']
 
 def testUI():
     intentions = ['cool down', 'ventilization']
-    selected = selectIntention(intentions)
-    if selected == 'cool down':
+    selected_intention = selectIntention(intentions)
+    if selected_intention == 'cool down':
         displayRemedialActions(samplePossibleRemediation())
 
 if __name__ == '__main__':
