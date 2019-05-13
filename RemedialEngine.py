@@ -31,12 +31,29 @@ def main(actuationGraph, conflictNode):
     if not remedialActions:
         return None
 
+    remedialActions = rankActions(selectedModule, remedialActions)
+    # If remove actions, modify the text of the actions.
     action = displayRemedialActions(remedialActions)
     return action
 
 #TODO: Connect this with conflict detector.
 def checkConflict(node):
     return False
+
+#TODO: Rank the remedial actions based on their costs
+def rankActions(module, actions):
+    return actions
+
+def removeActions(events, conflictList):
+    return events
+
+def groupEvents(events):
+    grouped = dict()
+    for event in events:
+        if not grouped[event.label]:
+            grouped[event.label] = list()
+        grouped[event.label].append(event)
+    return grouped
 
 def testRemdedialEngine():
     class HvacDevice(DeviceInstance):

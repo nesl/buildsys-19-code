@@ -83,15 +83,6 @@ def testAddChildren():
     hvacAbs = HvacAbstraction()
     graph.addAbstraction(hvacAbs)
     pprint(graph.modules)
-    # device1 = DeviceAbstraction(AbstractionSpecification(10.0, 100, 100,), "Device1")
-    # graph.addAbstraction(device1)
-    # device2 = DeviceAbstraction(AbstractionSpecification(11.0, 100, 100,), "Device2")
-    # graph.addAbstraction(device2, ["Device1"])
-    # device3 = DeviceAbstraction(AbstractionSpecification(12.0, 100, 100,), "Device3")
-    # graph.addAbstraction(device3, None, ["Device2"])
-    # print("Device1: \n***********\n", device1)
-    # print("\nDevice2: \n***********\n", device2)
-    # print("\nDevice3: \n***********\n", device3)
 
 
 if __name__ == "__main__":
