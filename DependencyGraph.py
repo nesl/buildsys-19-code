@@ -161,7 +161,7 @@ class DependencyGraph:
                 if found_route:
                     new_rule_is_valid = False
                     pop_out_from_graph.append([])
-                    for i in range(0, len(shortest_path)):
+                    for i in range(0, len(shortest_path)-1):
                         pop_out_from_graph[-1].append(self.remove(shortest_path[i], shortest_path[i + 1]))
                     # pop all links in current conflict chain
 
@@ -240,49 +240,51 @@ class DependencyGraph:
         topology_depth = list(np.zeros(len(self.nodes)))
         shortest_path = []
 
-        # start a BFS
-        trace_back[self.nodes.index(a)] = 0
-        current_depth = 1
-        visited, queue = [], [a]
-        found_dest = False
-        while len(queue):
-            current_node = queue[0]
-            if current_node not in visited:
-                visited.append(current_node)  # mark this vertex as visited
-            for each in current_node.outward_link:
-
-                if each == b:
-                    # We have found a trail leading to the destination in the graph
-                    found_dest = True
-                    queue.append(b)
-                    trace_back[self.nodes.index(b)] = current_node
-                    topology_depth[self.nodes.index(b)] = current_depth
-                    break  # break from for each in current_node.outward_link
-
-                else:
-                    if each not in visited:
-                        queue.append(each)
-                        trace_back[self.nodes.index(each)] = current_node
-                        topology_depth[self.nodes.index(each)] = current_depth
-
-            queue.pop(0)  # dequeue the current_node
-            if found_dest:
-                break  # break from while
-        if len(queue) == 0:
+        if a not in self.nodes:
+            return False, []
+        else:  # start a BFS
+            trace_back[self.nodes.index(a)] = 0
+            current_depth = 1
+            visited, queue = [], [a]
             found_dest = False
+            while len(queue):
+                current_node = queue[0]
+                if current_node not in visited:
+                    visited.append(current_node)  # mark this vertex as visited
+                for each in current_node.outward_link:
 
-        # Next step: Trace back from b to a and same the links along the way in a list
-        # In the future, if you want to pop out the conflicted rule from the list, then change here(add remove)
-        if found_dest:
-            dest_node = b
-            source_node =  None
-            shortest_path = [b]
-            while source_node != a:
-                source_node = trace_back[self.nodes.index(dest_node)]
-                shortest_path.append(source_node)
-                dest_node = source_node
+                    if each == b:
+                        # We have found a trail leading to the destination in the graph
+                        found_dest = True
+                        queue.append(b)
+                        trace_back[self.nodes.index(b)] = current_node
+                        topology_depth[self.nodes.index(b)] = current_depth
+                        break  # break from for each in current_node.outward_link
 
-        return found_dest, shortest_path.reverse
+                    else:
+                        if each not in visited:
+                            queue.append(each)
+                            trace_back[self.nodes.index(each)] = current_node
+                            topology_depth[self.nodes.index(each)] = current_depth
+
+                queue.pop(0)  # dequeue the current_node
+                if found_dest:
+                    break  # break from while
+            if len(queue) == 0:
+                found_dest = False
+
+            # Next step: Trace back from b to a and same the links along the way in a list
+            # In the future, if you want to pop out the conflicted rule from the list, then change here(add remove)
+            if found_dest:
+                dest_node = b
+                source_node =  None
+                shortest_path = [b]
+                while source_node != a:
+                    source_node = trace_back[self.nodes.index(dest_node)]
+                    shortest_path.append(source_node)
+                    dest_node = source_node
+            shortest_path.reverse()
+            return found_dest, shortest_path
 
 
     def DFS(self, a: GraphNode):
@@ -291,6 +293,7 @@ class DependencyGraph:
             curr_node = stack[-1]
             if curr_node not in visited:
                 visited.append(curr_node)
+            has_unvisited_child = False
             for each in curr_node.outward_link:
                 has_unvisited_child = False
                 if each not in visited:
@@ -344,18 +347,27 @@ class DependencyGraph:
     def graph_check_backward(self):
         pass
 
-
+    def print_contigency_table(self):
+        contigency_table = []
+        for node_a in self.nodes:
+            contigency_table.append([])
+            for node_b in self.nodes:
+                if node_b in node_a.outward_link:
+                    contigency_table[-1].append(1)
+                else:
+                    contigency_table[-1].append(0)
+        for i in range (0, len(contigency_table)):
+            for j in range(0, len(contigency_table)):
+                print(contigency_table[i][j], end=' ')
+            print()
 
 if __name__ == '__main__':
-    strings = [ "if temperature.val >= 70 then air_conditioner.state = 1 ",
-                "if air_conditioner.state = 1 then humidifier.state = 1",
-                "if humidity.val <= 70 and temperature.val <= 69 then air_conditioner.state = 0"]
-               # "if temperature.val <= 69 then air_conditioner.state = 0 ",
-               # "if air_conditioner.state = 0 then humidifier.state = 1 ",
-               # "if humidifier.state = 1 and temperature.val >= 70 and air_conditioner.state = 1 then air_conditioner.state = 0"]
-
+    strings = ["if A.val = 1 then B.val = 1", "if C.val = 1 then B.val = 1",
+               "if A.val = 1 then B.val = 0"]
     valid_abstract = {"temperature": ["val"], "air_conditioner": ["state"],
-                      "humidity": ["val"], "humidifier": ["state"]}
+                      "humidity": ["val"], "humidifier": ["state"],
+                      "A": ["val"], "B": ["val"], "C": ["val"], "D": ["val"], "E": ["val"], "F": ["val"],
+                      "G": ["val"], "H": ["val"], "I": ["val"], "J": ["val"], "K": ["val"], "L": ["val"]}
     test_graph = DependencyGraph()
     rule_collector = []
     for each in strings:
@@ -364,9 +376,10 @@ if __name__ == '__main__':
             rule_collector.append(rule_tuple)
     for each in rule_collector:
         popped_out = test_graph.add(each)
-    # test_graph.nodes[2].outward_link.append(test_graph.nodes[3])  # Force a link to form a loop
-    # test_graph.nodes[3].inward_link.append(test_graph.nodes[2])
-    result = test_graph.find_loop()
+
+    # result1 = test_graph.find_loop()
+    # result2 = test_graph.graph_check_forward()
+    test_graph.print_contigency_table()
     print("Done")
 
 
@@ -374,3 +387,38 @@ if __name__ == '__main__':
 #     a = GraphNode([ConditionStruct("humidity", '>=', "25"), ConditionStruct("humidity", '<=', "30")])
 #     b = GraphNode([ConditionStruct("humidity", '>=', "35")])
 #     print(is_compatible_or_identical(a,b))
+
+
+    # This string for testing add()
+    # strings = ["if temperature.val >= 70 then air_conditioner.state = 1 ",
+    #            "if air_conditioner.state = 1 then humidifier.state = 1",
+    #            "if humidity.val <= 70 and temperature.val <= 69 then air_conditioner.state = 0",
+    #            "if temperature.val <= 69 then air_conditioner.state = 0 ",
+    #            "if air_conditioner.state = 1 and temperature.val <= 69 then humidifier.state = 0 ",  # this conflicts to line 2
+    #            "if humidifier.state = 1 and temperature.val >= 70 and air_conditioner.state = 1 then air_conditioner.state = 0"] # this conflicts to line 1
+
+    # valid_abstract = {"temperature": ["val"], "air_conditioner": ["state"],
+    #                   "humidity": ["val"], "humidifier": ["state"],
+    #                   "A": ["val"], "B": ["val"], "C": ["val"], "D": ["val"], "E": ["val"], "F": ["val"],
+    #                   "G": ["val"], "H": ["val"], "I": ["val"], "J": ["val"], "K": ["val"], "L": ["val"]}
+
+    # test_graph = DependencyGraph()
+    # rule_collector = []
+    # for each in strings:
+    #     rule_tuple = IFTTTParser(each, valid_abstract)
+    #     if rule_tuple is not None:
+    #         rule_collector.append(rule_tuple)
+    # for each in rule_collector:
+    #     popped_out = test_graph.add(each)
+
+    # # test_graph.nodes[2].outward_link.append(test_graph.nodes[3])  # Force a link to form a loop
+    # # test_graph.nodes[3].inward_link.append(test_graph.nodes[2])
+
+    # result1 = test_graph.find_loop()
+    # result2 = test_graph.graph_check_forward()
+    # test_graph.print_contigency_table()
+    # print("Done")
+
+    # test add()
+    # strings = ["if A.val = 1 then C.val = 1", "if C.val = 1 then D.val = 1", "if D.val = 1 then B.val = 1",
+    #            "if A.val = 1 then B.val = 0"]
