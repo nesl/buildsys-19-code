@@ -109,7 +109,7 @@ class DependencyGraph:
     def __init__(self):
         self.nodes = []
 
-    def add(self, new_link: tuple):
+    def add(self, new_link: tuple, force=False):
         source_node = GraphNode(new_link[0])
         dest_node = GraphNode(new_link[1])
 
@@ -148,6 +148,20 @@ class DependencyGraph:
         # and meanwhile, dest_node is not compatible, which suggest the new action may counteract with others
         # In this case, we list all the existing compatible condtions C and uncompatible actions A
         # Run a search, if there exist a route in graph from c in C to a in A, the new rule need to be revised
+
+        if source_is_identical and dest_is_identical:
+            route_already_exist, _ = self.find_shortest_path(source_node, dest_node)
+            if route_already_exist:
+                return None
+
+        if force:  # forciably add a new link without checking conflicts. This is used to test other functions
+            if not source_is_identical:
+                self.nodes.append(source_node)
+            if not dest_is_identical:
+                self.nodes.append(dest_node)
+            source_node.outward_link.append(dest_node)
+            dest_node.inward_link.append(source_node)
+            return None
 
         pop_out_from_graph = []
         # pop_out_from_graph is a list, each element of which is a list containing tuples of conflict_links
@@ -325,21 +339,27 @@ class DependencyGraph:
                 is_compatible = True
 
                 for i in range(0, len(curr_node_desendents)):
-                    if not is_compatible:
-                        break
                     for j in range(0, len(compat_node_desendents)):
                         is_compatible, _ = is_compatible_or_identical(curr_node_desendents[i],
                                                                       compat_node_desendents[j], is_source_node=False)
                         if not is_compatible:
                             break
+                    if not is_compatible:
+                        break
 
                 if not is_compatible:
                     pop_out_from_graph.append([])
-                    for k in range(0, i):
-                        pop_out_from_graph[-1].append(self.remove(curr_node_desendents[k], curr_node_desendents[k + 1]))
+                    _, path_to_remove_curr = self.find_shortest_path(curr_node, curr_node_desendents[i])
+                    _, path_to_remove_compat = self.find_shortest_path(compat_node, compat_node_desendents[j])
+                    for k in range(0, len(path_to_remove_curr)-1):
+                        if path_to_remove_curr[k] in path_to_remove_compat and path_to_remove_curr[k+1] in path_to_remove_compat:
+                            temp_tuple = (path_to_remove_curr[k].val, path_to_remove_curr[k+1].val)
+                            pop_out_from_graph[-1].append(temp_tuple)
+                        else:
+                            pop_out_from_graph[-1].append(self.remove(path_to_remove_curr[k], path_to_remove_curr[k+1]))
                     pop_out_from_graph.append([])
-                    for k in range(0, j):
-                        pop_out_from_graph[-1].append(self.remove(compat_node_desendents[k], compat_node_desendents[k + 1]))
+                    for k in range(0, len(path_to_remove_compat)-1):
+                        pop_out_from_graph[-1].append(self.remove(path_to_remove_compat[k], path_to_remove_compat[k+1]))
 
         return pop_out_from_graph
 
@@ -362,8 +382,8 @@ class DependencyGraph:
             print()
 
 if __name__ == '__main__':
-    strings = ["if A.val = 1 then B.val = 1", "if C.val = 1 then B.val = 1",
-               "if A.val = 1 then B.val = 0"]
+    strings = ["if A.val = 1 then B.val = 1", "if B.val = 1 then C.val = 1", "if C.val = 1 then F.val = 1",
+               "if A.val = 1 then D.val = 1", "if D.val = 1 then E.val = 1", "if E.val = 1 then F.val = 0"]
     valid_abstract = {"temperature": ["val"], "air_conditioner": ["state"],
                       "humidity": ["val"], "humidifier": ["state"],
                       "A": ["val"], "B": ["val"], "C": ["val"], "D": ["val"], "E": ["val"], "F": ["val"],
@@ -375,10 +395,10 @@ if __name__ == '__main__':
         if rule_tuple is not None:
             rule_collector.append(rule_tuple)
     for each in rule_collector:
-        popped_out = test_graph.add(each)
+        popped_out = test_graph.add(each, force=True)
 
     # result1 = test_graph.find_loop()
-    # result2 = test_graph.graph_check_forward()
+    result2 = test_graph.graph_check_forward()
     test_graph.print_contigency_table()
     print("Done")
 

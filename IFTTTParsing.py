@@ -18,7 +18,7 @@ class ConditionStruct:
         self.value = value
 
 
-def IFTTTParser(strings, valid_abstract: dict, rule_collector: list):
+def IFTTTParser(strings, valid_abstract: dict):
     '''
     :param str: Input IFTTT rules
     :param valid_abstract: Existing abstracts, devices and room statues
@@ -65,15 +65,20 @@ def IFTTTParser(strings, valid_abstract: dict, rule_collector: list):
 
     if valid_attribute_flag:
         rule_tuple = (if_conditions, then_conditions)
-        rule_collector.append(rule_tuple)
-
+        return rule_tuple
+    else:
+        return None
 if __name__ == '__main__':
     strings = "if temperature.val >= 70 and humidity.val <= 12 then air_conditioner.state = 1 and humidifier.state = 1"
     strings_2 = "if humidity.val >= 80 then ventilation_fan.state = 1"
     valid_abstract = {"temperature":["val"], "air_conditioner":["state", "power_consump"],
                       "humidity":["val"], "humidifier":["state"]}
     rule_collector = []
-    IFTTTParser(strings, valid_abstract, rule_collector)
-    IFTTTParser(strings_2, valid_abstract, rule_collector)
+    rule_tuple = IFTTTParser(strings, valid_abstract)
+    if rule_tuple is not None:
+        rule_collector.append(rule_tuple)
+    rule_tuple = IFTTTParser(strings_2, valid_abstract)
+    if rule_tuple is not None:
+        rule_collector.append(rule_tuple)
     print(rule_collector)
 
