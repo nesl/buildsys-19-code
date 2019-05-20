@@ -22,12 +22,13 @@ def is_compatible_or_identical(a: GraphNode, b: GraphNode, is_source_node=True):
     for each_a in a.val:
         for each_b in b.val:
             if each_a.subject == each_b.subject:
+                command_value = [0,1]
                 if each_a.operator == '>=' and each_b.operator == '=':
                     # a is numerical and b is a command
                     # for conditions, they can be satisfied at the same time -> compatible
                     # for actions, they can be performed at the same time -> compatible
                     is_identical = False
-                    if each_a.value > each_b.value:
+                    if each_a.value > each_b.value and each_b.value not in command_value:
                         is_compatible = False
                         return is_compatible, is_identical
                 if each_a.operator == '=' and each_b.operator == '=':
@@ -42,7 +43,7 @@ def is_compatible_or_identical(a: GraphNode, b: GraphNode, is_source_node=True):
                     # for conditions, they can be satisfied at the same time -> compatible
                     # for actions, they can be performed at the same time -> compatible
                     is_identical = False
-                    if each_a.value < each_b.value:
+                    if each_a.value < each_b.value and each_b.value not in command_value:
                         is_compatible = False
                         return is_compatible, is_identical
                 if each_a.operator == '>=' and each_b.operator == '>=':
@@ -60,7 +61,7 @@ def is_compatible_or_identical(a: GraphNode, b: GraphNode, is_source_node=True):
                     # for conditions, they can be satisfied at the same time -> compatible
                     # for actions, they can be performed at the same time -> compatible
                     is_identical = False
-                    if each_a.value < each_b.value:
+                    if each_a.value < each_b.value and each_a.value not in command_value:
                         is_compatible = False
                         return is_compatible, is_identical
                 if each_a.operator == '<=' and each_b.operator == '>=':
@@ -80,7 +81,7 @@ def is_compatible_or_identical(a: GraphNode, b: GraphNode, is_source_node=True):
                     # for conditions, they can be satisfied at the same time -> compatible
                     # for actions, they can be performed at the same time -> compatible
                     is_identical = False
-                    if each_a.value > each_b.value:
+                    if each_a.value > each_b.value and each_a.value not in command_value:
                         is_compatible = False
                         return is_compatible, is_identical
                 if each_a.operator == '<=' and each_b.operator == '<=':
@@ -105,7 +106,7 @@ def is_compatible_or_identical(a: GraphNode, b: GraphNode, is_source_node=True):
     return is_compatible, is_identical
 
 
-class DependencyGraph:
+class DependencyGraphClass:
     def __init__(self):
         self.nodes = []
 
@@ -318,13 +319,33 @@ class DependencyGraph:
                 stack.pop()
         return visited
 
+    def reverse_BFS(self, a: GraphNode): # BFS based on inward link
+        trace_back = list(np.zeros(len(self.nodes)))
+        topology_depth = list(np.zeros(len(self.nodes)))
+        current_depth = 1
 
+        visited, queue = [], [a]
+        while len(queue):
+            current_node = queue[0]
+            if current_node not in visited:
+                visited.append(current_node)  # mark this vertex as visited
+            for each in current_node.inward_link:
+                if each not in visited:
+                    queue.append(each)
+                    trace_back[self.nodes.index(each)] = current_node
+                    topology_depth[self.nodes.index(each)] = current_depth
+            queue.pop(0)  # dequeue the current_node
+            current_depth += 1
+        return topology_depth
 
 
     def graph_check_forward(self):
-        pop_out_from_graph = []
+        conflicts_found = []
 
-        for curr_node in self.nodes:
+        index = 0
+        while index < len(self.nodes):
+            curr_node = self.nodes[index]
+            pop_out_from_graph = []
             compatible_conditions_list = []
             for node in self.nodes:
                 is_compatible, is_identical = is_compatible_or_identical(curr_node, node, is_source_node=True)
@@ -332,9 +353,12 @@ class DependencyGraph:
                     compatible_conditions_list.append(node)
             # find all compatible condition nodes
 
+            remove_happens = False
             for compat_node in compatible_conditions_list:
                 curr_node_desendents = self.DFS(curr_node)
+                curr_node_desendents.remove(curr_node)
                 compat_node_desendents = self.DFS(compat_node)
+                compat_node_desendents.remove(compat_node)
 
                 is_compatible = True
 
@@ -349,6 +373,7 @@ class DependencyGraph:
 
                 if not is_compatible:
                     pop_out_from_graph.append([])
+                    remove_happens = True
                     _, path_to_remove_curr = self.find_shortest_path(curr_node, curr_node_desendents[i])
                     _, path_to_remove_compat = self.find_shortest_path(compat_node, compat_node_desendents[j])
                     for k in range(0, len(path_to_remove_curr)-1):
@@ -360,8 +385,11 @@ class DependencyGraph:
                     pop_out_from_graph.append([])
                     for k in range(0, len(path_to_remove_compat)-1):
                         pop_out_from_graph[-1].append(self.remove(path_to_remove_compat[k], path_to_remove_compat[k+1]))
-
-        return pop_out_from_graph
+            if not remove_happens:
+                index = index + 1
+            else:
+                conflicts_found.append(pop_out_from_graph)
+        return conflicts_found
 
 
     def graph_check_backward(self):
@@ -383,12 +411,14 @@ class DependencyGraph:
 
 if __name__ == '__main__':
     strings = ["if A.val = 1 then B.val = 1", "if B.val = 1 then C.val = 1", "if C.val = 1 then F.val = 1",
-               "if A.val = 1 then D.val = 1", "if D.val = 1 then E.val = 1", "if E.val = 1 then F.val = 0"]
+               "if A.val = 1 then D.val = 1", "if D.val = 1 then E.val = 1", "if E.val = 1 then F.val = 0",
+               "if K.val = 1 then L.val = 0", "if L.val = 0 then K.val = 1", "if H.val = 0 then I.val = 0",
+               "if H.val = 0 then I.val = 1"]
     valid_abstract = {"temperature": ["val"], "air_conditioner": ["state"],
                       "humidity": ["val"], "humidifier": ["state"],
                       "A": ["val"], "B": ["val"], "C": ["val"], "D": ["val"], "E": ["val"], "F": ["val"],
                       "G": ["val"], "H": ["val"], "I": ["val"], "J": ["val"], "K": ["val"], "L": ["val"]}
-    test_graph = DependencyGraph()
+    test_graph = DependencyGraphClass()
     rule_collector = []
     for each in strings:
         rule_tuple = IFTTTParser(each, valid_abstract)
@@ -396,8 +426,8 @@ if __name__ == '__main__':
             rule_collector.append(rule_tuple)
     for each in rule_collector:
         popped_out = test_graph.add(each, force=True)
-
-    # result1 = test_graph.find_loop()
+    ans = test_graph.reverse_BFS(test_graph.nodes[3])
+    result1 = test_graph.find_loop()
     result2 = test_graph.graph_check_forward()
     test_graph.print_contigency_table()
     print("Done")
@@ -422,7 +452,7 @@ if __name__ == '__main__':
     #                   "A": ["val"], "B": ["val"], "C": ["val"], "D": ["val"], "E": ["val"], "F": ["val"],
     #                   "G": ["val"], "H": ["val"], "I": ["val"], "J": ["val"], "K": ["val"], "L": ["val"]}
 
-    # test_graph = DependencyGraph()
+    # test_graph = DependencyGraphClass()
     # rule_collector = []
     # for each in strings:
     #     rule_tuple = IFTTTParser(each, valid_abstract)

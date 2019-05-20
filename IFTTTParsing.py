@@ -39,10 +39,10 @@ def IFTTTParser(strings, valid_abstract: dict):
 
         # Determine whether the subject is valid. E.g. whether temprature.val is per-defined
         class_name, attr_name = subject.split(".")
-        if_valid_attributes = valid_abstract.get(class_name, [])
-        if attr_name not in if_valid_attributes:
-            valid_attribute_flag = 0
-            print("{}.{} is not a valid source attribute.".format(class_name, attr_name))
+        # if_valid_attributes = valid_abstract.get(class_name, [])
+        # if attr_name not in if_valid_attributes:
+        #     valid_attribute_flag = 0
+        #     print("{}.{} is not a valid source attribute.".format(class_name, attr_name))
 
         if_conditions.append(ConditionStruct(subject, operator, value))
 
@@ -56,10 +56,10 @@ def IFTTTParser(strings, valid_abstract: dict):
 
         # Determine whether the subject is valid. E.g. whether temprature.val is per-defined
         class_name, attr_name = subject.split(".")
-        then_valid_attributes = valid_abstract.get(class_name, [])
-        if attr_name not in then_valid_attributes:
-            valid_attribute_flag = 0
-            print("{}.{} is not a valid source attribute.".format(class_name, attr_name))
+        # then_valid_attributes = valid_abstract.get(class_name, [])
+        # if attr_name not in then_valid_attributes:
+        #     valid_attribute_flag = 0
+        #     print("{}.{} is not a valid source attribute.".format(class_name, attr_name))
 
         then_conditions.append(ConditionStruct(subject, operator, value))
 

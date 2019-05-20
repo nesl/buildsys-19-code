@@ -1,0 +1,36 @@
+if humidity.value >= 70 then fan.state = 1
+if humidity.value <= 50 then fan.state = 0
+if user.home = 1 then door.state = 0
+if light.state = 1 then door.state = 0
+if door.state = 0 then light.state = 1
+if coffee.state = 1 then light.state = 1
+if user.home = 0 then light.state = 0
+if user.home = 1 then light.state = 1
+if user.home = 0 then heater.state = 1 and thermal.temp = 60
+if door.state = 1 then light.state = 0
+if co2.state = 1 then fan.state = 1
+if thermal.temp = 60 then fan.state = 0
+if gas.state = 1 then text.state = 1
+if humidity.value >= 70 then text.state = 1 and valve.state = 0
+if user.shower = 1 then coffee.state = 1
+if user.home = 1 then outlet.state = 1
+if door_jam.state = 1 then notification.state = 1
+if door.state = 0 then light.state = 1
+if humidity.value >= 50 then valve.state = 1
+if water_leakge.state = 1 then notification.state = 1
+if user.home = 0 and motion.state = 1 then notification.state = 1
+if home_mode.state = 1 then heater.state = 0 and ac.state = 0
+if temprature.value >= 70 then ac.state = 1
+if temprature.value <= 70 then heater.state = 1
+if user.home = 1 then mode_change.state = 1
+if user.home = 1 and door.state = 1 then light.state = 1
+if humidity.value <= 50 then valve.state = 0
+if motion.state = 1 then text.state = 1
+if user.home = 0 then window.state = 0
+if energy.cost >= 100 then high_power.state = 0
+if home_mode.state = 1 then high_power.state = 1
+if secure_mode.state = 1 then camera.state = 1
+if user.home = 1 then camera.state = 0
+if light.state = 1 and day.morning = 1 then speaker.state = 1
+if humidity.value <= 60 then water.valve = 1
+if water_leakage.state = 1 then water.valve = 0
