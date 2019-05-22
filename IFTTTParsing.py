@@ -17,6 +17,9 @@ class ConditionStruct:
         self.operator = operator
         self.value = value
 
+    def printConditionStruct(self):
+        print(self.subject + ' ' + self.operator + ' ' + self.value)
+
 
 def IFTTTParser(strings, valid_abstract: dict):
     '''
@@ -81,4 +84,3 @@ if __name__ == '__main__':
     if rule_tuple is not None:
         rule_collector.append(rule_tuple)
     print(rule_collector)
-

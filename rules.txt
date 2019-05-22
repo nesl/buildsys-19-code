@@ -2,6 +2,7 @@ if humidity.value >= 70 then fan.state = 1
 if humidity.value <= 50 then fan.state = 0
 if user.home = 1 then door.state = 0
 if light.state = 1 then door.state = 0
+if user.home = 1 then door.state = 1
 if door.state = 0 then light.state = 1
 if coffee.state = 1 then light.state = 1
 if user.home = 0 then light.state = 0
