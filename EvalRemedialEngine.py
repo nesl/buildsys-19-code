@@ -265,6 +265,15 @@ class EvalActuationGraph:
             super(GreenEnergyModule, self).addAbstraction(allElectricDevicesOff)
             super(GreenEnergyModule, self).addAbstraction(lowPowerModeDevices)
 
+    class WarningNotification(Module):
+        def __init__(self):
+            Module.__init__(self, 'warning the users')
+            textUsingSmartphone = TextUsingSmartphone()
+            warningUsingSpeaker = WarningUsingSpeaker()
+            warningUsingLightBulbs = WarningUsingLightBulbs()
+            super(WarningNotification, self).addAbstraction(textUsingSmartphone)
+            super(WarningNotification, self).addAbstraction(warningUsingSpeaker)
+            super(WarningNotification, self).addAbstraction(warningUsingLightBulbs)
 
     def __init__(self):
         pass
