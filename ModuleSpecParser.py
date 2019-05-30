@@ -5,10 +5,8 @@
 from Abstraction import Abstraction
 
 class Module:
-    name = ''
-    abstractions = dict() # All name in string for the abstractions
-
     def __init__(self, name):
+        self.abstractions = dict() # All name in string for the abstractions
         self.name = name
 
     def cost(self):
@@ -16,23 +14,12 @@ class Module:
         return 1
 
     def addAbstraction(self, abstraction):
-        self.abstractions[abstraction.name] = abstraction
         for instance in abstraction.childDeviceInstance:
             instance.addParentsInfo(self.name)
+        self.abstractions[abstraction.name] = abstraction
 
     def callFunc(self, name, *args):
         self.abstractions[name].performFunc(*args)
 
     def getAbstractionList(self):
         return self.abstractions
-
-def testModuleSpectSheet():
-    #TODO: Add the test function here.
-    return
-
-class TurnOnAC(Abstraction):
-    def __init__ ():
-        pass
-
-if __name__ == "__main__":
-    testModuleSpectSheet()

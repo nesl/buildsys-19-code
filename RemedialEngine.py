@@ -10,6 +10,7 @@ def main(actuationGraph, conflictNode):
     intention = set()
 
     for parent in conflictNode.parentAbstractions:
+        print(parent)
         intention.add(parent)
 
     if not intention:

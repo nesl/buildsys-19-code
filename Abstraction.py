@@ -10,18 +10,13 @@ ACTUATION = 1
     Abstraction classes:
 '''
 class Abstraction:
-    name = ''
-    childAbstractions = set() # Abstraction Set using the name of string
-    parentAbstractions = set() # Abstraction Set using the name of string
-    cost = sys.maxsize
-    moduleName = ''
-    childDeviceInstance = set() # DeviceInstance Set
-    range = set()
-    state = None
-    type = -1
-    busy = False
-
     def __init__(self, name, moduleName, initState, type):
+        self.childAbstractions = set() # Abstraction Set using the name of string
+        self.parentAbstractions = set() # Abstraction Set using the name of string
+        self.cost = sys.maxsize
+        self.childDeviceInstance = set() # DeviceInstance Set
+        self.range = set()
+        self.busy = False
         self.moduleName = moduleName
         self.name = name
         self.state = initState
@@ -89,12 +84,8 @@ class Abstraction:
 
 
 class DeviceInstance:
-    name = ''
-    satus = None
-    parentAbstractions = set()
-    deviceInfo = None
-
     def __init__(self, status, name, deviceInfo):
+        self.parentAbstractions = set()
         self.name = name
         self.status = status # On or OFF. Or discrete value.
         self.deviceInfo = deviceInfo

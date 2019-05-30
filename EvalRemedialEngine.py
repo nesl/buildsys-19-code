@@ -8,7 +8,6 @@ from Abstraction import *
 
 
 class EvalActuationGraph:
-    graph = None
     def __init__(self):
         class WindowInstance(DeviceInstance):
             def __init__(self):
@@ -221,6 +220,7 @@ class EvalActuationGraph:
                 super(CoolDownModule, self).addAbstraction(acTurnOn)
                 super(CoolDownModule, self).addAbstraction(fanTurOn)
                 super(CoolDownModule, self).addAbstraction(windowOpening)
+                print('done')
 
         class HeatingUpModule(Module):
             def __init__(self):
@@ -228,6 +228,10 @@ class EvalActuationGraph:
                 heaterTurnOn = HeaterTurnOn()
                 fireplaceLightUp = FirePlaceLightUp()
                 windowOpening = WindowOpening('heating up')
+                # print('#############################')
+                # for instance in heaterTurnOn.childDeviceInstance:
+                #     print(instance.name + "=>" + self.name)
+                # print('#############################')
                 super(HeatingUpModule, self).addAbstraction(heaterTurnOn)
                 super(HeatingUpModule, self).addAbstraction(fireplaceLightUp)
                 super(HeatingUpModule, self).addAbstraction(windowOpening)
