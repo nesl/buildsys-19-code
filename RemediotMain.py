@@ -10,6 +10,8 @@ PRIORITY_ENERGY = 1
 PRIORITY_USABILITY = 2
 PRIORITY_DEFAULT = PRIORITY_USABILITY
 
+PRIORITY_TABLE = dict()
+
 class EventNode:
     def __init__(self, event, priority, remedial_action_index=-1, block=False):
         self.event = event
@@ -40,20 +42,42 @@ if __name__ == '__main__':
 
         rule_tuple = IFTTTParser(rule, {})
         conflict = dependencyGraph.add(rule_tuple, remove=False)
+        PRIORITY_TABLE[rule] = priority
 
         if conflict is not None:
             conflict_devices_names = set()
+            conflict_events = []
             for entry in conflict:  # entry is a link
                 for connection in entry: # connection is a tuple
-                    # for condition in connection[0]:
+                    recovered_event = ''
+                    for condition in connection[0]:
+                        recovered_event = recovered_event + ' and' + condition.subject + ' ' + condition.operator + ' ' + condition.value
                         # condition.printConditionStruct()
                         # print("({} {} {})".format(condition.subject, condition.operator, condition.value))
                     # print("->")
+                    recovered_event = 'if ' + recovered_event[4:] + ' '
+                    recovered_action = ''
                     for action in connection[1]:
                         # action.printConditionStruct()
                         # print("({} {} {})".format(action.subject, action.operator, action.value))
+                        recovered_action = recovered_action + ' and' + action.subject + ' ' + action.operator + ' ' + action.value
                         name = action.subject.split('.')[0]
                         conflict_devices_names.add(name)
+                    recovered_event = recovered_event + 'then ' + recovered_action[4:]
+                    conflict_events.append(recovered_event)
+
+            if PRIORITY_TABLE[conflict_events[-1]] <= PRIORITY_TABLE[conflict_events[0]]:
+                for e in conflict_events[:-1]:
+                    if dependencyGraph.add(IFTTTParser(e, {})):
+                        print('THERE ARE ERRORS IN THE ALGORITHM!!!!!')
+                        sys.exit()
+                    conflict_devices_names = list(conflict_devices_names)[-1:]
+            else:
+                if dependencyGraph.add(IFTTTParser(conflict_events[-1], {})):
+                    print('THERE ARE ERRORS IN THE ALGORITHM!!!!!')
+                    sys.exit()
+                conflict_devices_names = list(conflict_devices_names)[:-1]
+
             for name in conflict_devices_names:
                 conflict_devices = evalGraph.graph.getDeviceInstance(name)
                 remedial_action = obtain_remedial_action(evalGraph.graph, conflict_devices, dependencyGraph=dependencyGraph, conflict_condition=rule.split('then')[0])

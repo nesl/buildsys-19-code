@@ -177,8 +177,6 @@ class DependencyGraphClass:
                     new_rule_is_valid = False
                     pop_out_from_graph.append([])
                     for i in range(0, len(shortest_path)-1):
-                        # if not remove:
-                        #     return dest_node
                         pop_out_from_graph[-1].append(self.remove(shortest_path[i], shortest_path[i + 1], remove=remove))
                     # pop all links in current conflict chain
 
