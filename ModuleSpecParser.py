@@ -18,8 +18,11 @@ class Module:
             instance.addParentsInfo(self.name)
         self.abstractions[abstraction.name] = abstraction
 
-    def callFunc(self, name, *args):
-        self.abstractions[name].performFunc(*args)
+    def callFunc(self, name):
+        self.abstractions[name].performFunc()
+
+    def getAbstraction(self, name):
+        return self.abstractions[name]
 
     def getAbstractionList(self):
         return self.abstractions

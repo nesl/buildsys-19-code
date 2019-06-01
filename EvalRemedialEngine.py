@@ -81,8 +81,9 @@ class EvalActuationGraph:
                 speakerInstance = SpeakerInstance()
                 super(WarningUsingSpeaker, self).appendChildDeviceInstance(speakerInstance)
 
-            def performFunc(self, *argc):
+            def performFunc(self):
                 print('playing warning sound')
+                return 'speaker.state = 1'
 
         class WarningUsingLightBulbs(Abstraction):
             def __init__(self, moduleName):
@@ -90,8 +91,9 @@ class EvalActuationGraph:
                 lightBulbsInstance = LightBulbsInstance()
                 super(WarningUsingLightBulbs, self).appendChildDeviceInstance(lightBulbsInstance)
 
-            def performFunc(self, *argc):
+            def performFunc(self):
                 print('flash warning lights')
+                return 'lightbulb.state = 1'
 
         class TextUsingSmartphone(Abstraction):
             def __init__(self, moduleName):
@@ -99,8 +101,9 @@ class EvalActuationGraph:
                 smartphoneInstance = SmartphoneInstance()
                 super(TextUsingSmartphone, self).appendChildDeviceInstance(smartphoneInstance)
 
-            def performFunc(self, *argc):
+            def performFunc(self):
                 print('text the user something')
+                return 'smartphone_text.state = 1'
 
         class AllElectricDevicesOff(Abstraction):
             def __init__(self, moduleName):
@@ -108,8 +111,9 @@ class EvalActuationGraph:
                 allElectricDevicesInstance = AllElectricDevicesInstance()
                 super(AllElectricDevicesOff, self).appendChildDeviceInstance(allElectricDevicesInstance)
 
-            def performFunc(self, *argc):
+            def performFunc(self):
                 print('turning off all of the electric devices')
+                return 'all_devices.state = 0'
 
         class LowPowerModeDevices(Abstraction):
             def __init__(self, moduleName):
@@ -117,8 +121,9 @@ class EvalActuationGraph:
                 allElectricDevicesInstance = AllElectricDevicesInstance()
                 super(LowPowerModeDevices, self).appendChildDeviceInstance(allElectricDevicesInstance)
 
-            def performFunc(self, *argc):
+            def performFunc(self):
                 print('setting low-power mode for all of the electric devices')
+                return 'all_devices.lowerpower = 1'
 
         class MotionSensorDetection(Abstraction):
             def __init__(self, moduleName):
@@ -126,8 +131,9 @@ class EvalActuationGraph:
                 motionSensorInstance = MotionSensorInstance()
                 super(MotionSensorDetection, self).appendChildDeviceInstance(motionSensorInstance)
 
-            def performFunc(self, *argc):
+            def performFunc(self):
                 print('detecting the motion through motion sensor')
+                return 'motion_sensor.state = 1'
 
         class CameraMotionDetection(Abstraction):
             def __init__(self, moduleName):
@@ -135,8 +141,9 @@ class EvalActuationGraph:
                 cameraInstance = CameraInstance()
                 super(CameraMotionDetection, self).appendChildDeviceInstance(cameraInstance)
 
-            def performFunc(self, *argc):
+            def performFunc(self):
                 print('detecting the motion through camera')
+                return 'camera.state = 1'
 
         class CurtainOpen(Abstraction):
             def __init__(self, moduleName):
@@ -144,8 +151,9 @@ class EvalActuationGraph:
                 curtainControlInstance = CurtainControlInstance()
                 super(CurtainOpen, self).appendChildDeviceInstance(curtainControlInstance)
 
-            def performFunc(self, *argc):
+            def performFunc(self):
                 print('opening the curtain now')
+                return 'curtain.state = 1'
 
         class LightBulbTurningOn(Abstraction):
             def __init__(self, moduleName):
@@ -153,8 +161,9 @@ class EvalActuationGraph:
                 lightBulbsInstance = LightBulbsInstance()
                 super(LightBulbTurningOn, self).appendChildDeviceInstance(lightBulbsInstance)
 
-            def performFunc(self, *argc):
+            def performFunc(self):
                 print('turning on the light bulbs now')
+                return 'lightbulb.state = 1'
 
         class DoorOpening(Abstraction):
             def __init__(self, moduleName):
@@ -162,8 +171,9 @@ class EvalActuationGraph:
                 doorControlInstance = DoorControlInstance()
                 super(DoorOpening, self).appendChildDeviceInstance(doorControlInstance)
 
-            def performFunc(self, *argc):
+            def performFunc(self):
                 print('opening the doors now')
+                return 'door.state = 1'
 
         class FirePlaceLightUp(Abstraction):
             def __init__(self):
@@ -171,8 +181,9 @@ class EvalActuationGraph:
                 firePlaceInstance = FirePlaceInstance()
                 super(FirePlaceLightUp, self).appendChildDeviceInstance(firePlaceInstance)
 
-            def performFunc(self, *argc):
+            def performFunc(self):
                 print('lighting up the fireplace now')
+                return 'fireplace.state = 1'
 
         class HeaterTurnOn(Abstraction):
             def __init__(self):
@@ -180,8 +191,9 @@ class EvalActuationGraph:
                 heaterInstance = HeaterInstance()
                 super(HeaterTurnOn, self).appendChildDeviceInstance(heaterInstance)
 
-            def performFunc(self, *argc):
+            def performFunc(self):
                 print('Turning on heater now')
+                return 'heater.state = 1'
 
         class AirConditionerTurnOn(Abstraction):
             def __init__(self):
@@ -189,8 +201,9 @@ class EvalActuationGraph:
                 acInstance = AirConditionerInstance()
                 super(AirConditionerTurnOn, self).appendChildDeviceInstance(acInstance)
 
-            def performFunc(self, *args):
+            def performFunc(self):
                 print('Turning on the HVAC now')
+                return 'ac.state = 1'
 
         class WindowOpening(Abstraction):
             def __init__(self, moduleName):
@@ -198,8 +211,9 @@ class EvalActuationGraph:
                 windowInstance = WindowInstance()
                 super(WindowOpening, self).appendChildDeviceInstance(windowInstance)
 
-            def performFunc(self, *args):
+            def performFunc(self):
                 print('Opening the window now.')
+                return 'window.state = 1'
 
         class FanTurnOn(Abstraction):
             def __init__(self, moduleName):
@@ -207,9 +221,9 @@ class EvalActuationGraph:
                 fanInstance = FanInstance()
                 super(FanTurnOn, self).appendChildDeviceInstance(fanInstance)
 
-            def performFunc(self, *args):
+            def performFunc(self):
                 print('Turning on the fan now')
-
+                return 'fan.state = 1'
 
         class CoolDownModule(Module):
             def __init__(self):
@@ -220,7 +234,6 @@ class EvalActuationGraph:
                 super(CoolDownModule, self).addAbstraction(acTurnOn)
                 super(CoolDownModule, self).addAbstraction(fanTurOn)
                 super(CoolDownModule, self).addAbstraction(windowOpening)
-                print('done')
 
         class HeatingUpModule(Module):
             def __init__(self):

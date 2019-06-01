@@ -64,6 +64,9 @@ class Abstraction:
     def appendParentAbstraction(self,parentAbstraction):
         self.parentAbstractions.add(parentAbstraction)
 
+    def getChildDeviceInstance(self):
+        return self.childDeviceInstance
+
     def __hash__(self):
         return hash(self.name)
 

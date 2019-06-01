@@ -110,7 +110,7 @@ class DependencyGraphClass:
     def __init__(self):
         self.nodes = []
 
-    def add(self, new_link: tuple, force=False):
+    def add(self, new_link: tuple, force=False, remove=True):
         source_node = GraphNode(new_link[0])
         dest_node = GraphNode(new_link[1])
 
@@ -177,7 +177,9 @@ class DependencyGraphClass:
                     new_rule_is_valid = False
                     pop_out_from_graph.append([])
                     for i in range(0, len(shortest_path)-1):
-                        pop_out_from_graph[-1].append(self.remove(shortest_path[i], shortest_path[i + 1]))
+                        # if not remove:
+                        #     return dest_node
+                        pop_out_from_graph[-1].append(self.remove(shortest_path[i], shortest_path[i + 1], remove=remove))
                     # pop all links in current conflict chain
 
         if not new_rule_is_valid:
@@ -193,14 +195,15 @@ class DependencyGraphClass:
             dest_node.inward_link.append(source_node)
             return None
 
-    def remove(self, a: GraphNode, b: GraphNode):
+    def remove(self, a: GraphNode, b: GraphNode, remove=True):
         # remove an edge a->b, a and b are known pointers of two nodes that are ALREADY in the graph
-        a.outward_link.remove(b)
-        b.inward_link.remove(a)
-        if len(a.outward_link) == 0 and len(a.inward_link) == 0:
-            self.nodes.remove(a)
-        if len(b.outward_link) == 0 and len(b.inward_link) == 0:
-            self.nodes.remove(b)
+        if remove:
+            a.outward_link.remove(b)
+            b.inward_link.remove(a)
+            if len(a.outward_link) == 0 and len(a.inward_link) == 0:
+                self.nodes.remove(a)
+            if len(b.outward_link) == 0 and len(b.inward_link) == 0:
+                self.nodes.remove(b)
         removed_link = (a.val, b.val)
         return removed_link
 

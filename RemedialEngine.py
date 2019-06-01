@@ -5,12 +5,12 @@
 from UserInterface import *
 from AbstractGraph import *
 from Abstraction import *
+from IFTTTParsing import ConditionStruct, IFTTTParser
 
-def main(actuationGraph, conflictNode):
+def main(actuationGraph, conflictNode, conflict_condition = None, dependencyGraph = None):
     intention = set()
 
     for parent in conflictNode.parentAbstractions:
-        print(parent)
         intention.add(parent)
 
     if not intention:
@@ -26,7 +26,7 @@ def main(actuationGraph, conflictNode):
     remedialActions = set()
 
     for abstraction in allAbstractions:
-        if abstraction != conflictNode and not checkConflict(abstraction):
+        if abstraction != conflictNode and not checkConflict(selectedModule.getAbstraction(abstraction), dependencyGraph, conflict_condition):
             remedialActions.add(abstraction)
 
     if not remedialActions:
@@ -37,8 +37,12 @@ def main(actuationGraph, conflictNode):
     action = displayRemedialActions(remedialActions)
     return action
 
-#TODO: Connect this with conflict detector.
-def checkConflict(node):
+def checkConflict(node, dependencyGraph, conflict_condition):
+    rule = conflict_condition + 'then ' + node.performFunc()
+    print(rule)
+    rule_tuple = IFTTTParser(rule, {})
+    if dependencyGraph.add(rule_tuple, remove=False):
+        return True
     return False
 
 #TODO: Rank the remedial actions based on their costs
