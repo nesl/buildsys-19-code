@@ -34,7 +34,7 @@ def main(actuationGraph, conflictNode, conflict_condition = None, dependencyGrap
         selected = None if len(intention_candidate) == 0 else intention_candidate[0]
 
     if not selected:
-        return None
+        return None, None
 
     selectedModule = actuationGraph.getModule(selected)
     allAbstractions = selectedModule.getAbstractionList()
@@ -46,7 +46,7 @@ def main(actuationGraph, conflictNode, conflict_condition = None, dependencyGrap
             remedialActions.add(abstraction)
 
     if not remedialActions:
-        return None
+        return None, None
 
     rankedActions = rankActions(selectedModule, remedialActions)
     # If remove actions, modify the text of the actions.
@@ -54,11 +54,11 @@ def main(actuationGraph, conflictNode, conflict_condition = None, dependencyGrap
         action = displayRemedialActions(rankedActions)
     else:
         action = rankedActions[0]
-    return action
+    return action, selectedModule.getAbstraction(action).performFunc()
 
 def checkConflict(node, dependencyGraph, conflict_condition):
     rule = conflict_condition + 'then ' + node.performFunc()
-    print(rule)
+    # print(rule)
     rule_tuple = IFTTTParser(rule, {})
     if dependencyGraph.add(rule_tuple, remove=False):
         return True

@@ -20,7 +20,8 @@ def displayRemedialActions(actions):
         window.destroy()
 
     def radioChoice():
-        print("You selected " + var.get())
+        pass
+        # print("You selected " + var.get())
 
     def cancelClicked():
         window.destroy()

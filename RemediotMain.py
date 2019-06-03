@@ -80,12 +80,18 @@ if __name__ == '__main__':
 
             for name in conflict_devices_names:
                 conflict_devices = evalGraph.graph.getDeviceInstance(name)
-                remedial_action = obtain_remedial_action(evalGraph.graph, conflict_devices, dependencyGraph=dependencyGraph, conflict_condition=rule.split('then')[0])
+                remedial_action, remedial_state = obtain_remedial_action(evalGraph.graph, conflict_devices, dependencyGraph=dependencyGraph, conflict_condition=rule.split('then')[0])
                 event = None
                 if remedial_action is None:
                     event = EventNode(rule, priority, block=True)
                 else:
                     event = EventNode(rule, priority, remedial_action_index=len(remedial_action_database))
+                    remedial_action = rule.split('then')[0] + 'then ' + remedial_state
+                    rule_tuple = IFTTTParser(remedial_action, {})
+                    conflict = dependencyGraph.add(rule_tuple, remove=False)
+                    if conflict:
+                        print('ERRORS! The remedial action should never have a conflict')
+                        sys.exit()
                     remedial_action_database.append(remedial_action)
                 events_database.add(event)
                 print(remedial_action)
