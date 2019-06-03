@@ -7,7 +7,7 @@ from AbstractGraph import *
 from Abstraction import *
 from IFTTTParsing import ConditionStruct, IFTTTParser
 
-def main(actuationGraph, conflictNode, conflict_condition = None, dependencyGraph = None):
+def main(actuationGraph, conflictNode, conflict_condition = None, dependencyGraph = None, test=True):
     intention = set()
 
     for parent in conflictNode.parentAbstractions:
@@ -16,8 +16,24 @@ def main(actuationGraph, conflictNode, conflict_condition = None, dependencyGrap
     if not intention:
         return None
 
-    selected = selectIntention(intention)
-    if selected is None:
+    # Detect the given intention might not have any remedial actions.
+    intention_candidate = []
+    for intent in intention:
+        moduleCandidate = actuationGraph.getModule(intent)
+        absCandidate = moduleCandidate.getAbstractionList()
+        addToCandidate = False
+        for abst in absCandidate:
+            if abst != conflictNode and not checkConflict(moduleCandidate.getAbstraction(abst), dependencyGraph, conflict_condition):
+                addToCandidate = True
+        if addToCandidate:
+            intention_candidate.append(intent)
+
+    if not test:
+        selected = selectIntention(intention_candidate)
+    else:
+        selected = None if len(intention_candidate) == 0 else intention_candidate[0]
+
+    if not selected:
         return None
 
     selectedModule = actuationGraph.getModule(selected)
@@ -32,9 +48,12 @@ def main(actuationGraph, conflictNode, conflict_condition = None, dependencyGrap
     if not remedialActions:
         return None
 
-    remedialActions = rankActions(selectedModule, remedialActions)
+    rankedActions = rankActions(selectedModule, remedialActions)
     # If remove actions, modify the text of the actions.
-    action = displayRemedialActions(remedialActions)
+    if not test:
+        action = displayRemedialActions(rankedActions)
+    else:
+        action = rankedActions[0]
     return action
 
 def checkConflict(node, dependencyGraph, conflict_condition):
@@ -47,7 +66,10 @@ def checkConflict(node, dependencyGraph, conflict_condition):
 
 #TODO: Rank the remedial actions based on their costs
 def rankActions(module, actions):
-    return actions
+    ranked = []
+    for action in actions:
+        ranked.append(action)
+    return ranked
 
 def removeActions(events, conflictList):
     return events
