@@ -8,6 +8,10 @@ from Abstraction import *
 from IFTTTParsing import ConditionStruct, IFTTTParser
 
 def main(actuationGraph, conflictNode, conflict_condition = None, dependencyGraph = None, test=True):
+
+    if not conflictNode:
+        return None, None
+
     intention = set()
 
     for parent in conflictNode.parentAbstractions:

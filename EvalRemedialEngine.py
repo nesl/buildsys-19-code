@@ -42,7 +42,7 @@ class EvalActuationGraph:
         class LightBulbsInstance(DeviceInstance):
             def __init__(self):
                 deviceInfo = DeviceInfo("null", "null", "null", "null", "null")
-                DeviceInstance.__init__(self, True, 'light_bulbs', deviceInfo)
+                DeviceInstance.__init__(self, True, 'light', deviceInfo)
 
         class CurtainControlInstance(DeviceInstance):
             def __init__(self):

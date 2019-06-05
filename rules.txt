@@ -33,5 +33,5 @@ if home_mode.state = 1 then high_power.state = 1
 if secure_mode.state = 1 then camera.state = 1
 if user.home = 1 then camera.state = 0
 if light.state = 1 and day.morning = 1 then speaker.state = 1
-if humidity.value <= 60 then water.valve = 1
-if water_leakage.state = 1 then water.valve = 0
+if humidity.value <= 60 then valve.state = 1
+if water_leakage.state = 1 then valve.state = 0

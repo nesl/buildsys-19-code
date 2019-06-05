@@ -19,6 +19,33 @@ class EventNode:
         self.block = block
         self.priority = priority
 
+def generateResults(events_database, remedial_action_database):
+    conflict = 0
+    remedial_action = 0
+    blocked = 0
+    total = 0
+    for event in events_database:
+        if event.block:
+            blocked += 1
+        if event.remedial_action_index != -1:
+            remedial_action += 1
+        if event.block or event.remedial_action_index != -1:
+            conflict += 1
+        total += 1
+
+    if remedial_action != len(remedial_action_database):
+        print('Error! Remedial events do not equal to action databse size')
+
+    print('###########################################')
+    print('Total Events: ' + str(total))
+    print('Total Conflicts: ' + str(conflict))
+    print('Blocked Events: ' + str(blocked))
+    print('Total Remedial Actions: ' + str(remedial_action))
+    print('Conflict Percentage: ' + str(round(float(conflict)/float(total)*100, 2)))
+    print('Blocked Percentage out of Conflicts: ' + str(round(float(blocked)/float(conflict)*100, 2)))
+    print('Remedial Action Percentage out of Conflicts: ' + str(round(float(remedial_action)/float(conflict)*100, 2)))
+    print('###########################################')
+
 if __name__ == '__main__':
     events_database = set()
     remedial_action_database = []
@@ -31,8 +58,10 @@ if __name__ == '__main__':
     priority_list['energy'] = PRIORITY_ENERGY
     priority_list['usability'] = PRIORITY_USABILITY
     priority_list['default'] = PRIORITY_DEFAULT
+
+    fh = open('rules.txt', 'r')
     # for rule in sys.stdin:
-    for rule in rules:
+    for rule in fh:
         rule_raw = rule.strip()
         rule = rule_raw.split(',')[0]
         priority = PRIORITY_DEFAULT
@@ -51,19 +80,19 @@ if __name__ == '__main__':
                 for connection in entry: # connection is a tuple
                     recovered_event = ''
                     for condition in connection[0]:
-                        recovered_event = recovered_event + ' and' + condition.subject + ' ' + condition.operator + ' ' + condition.value
+                        recovered_event = recovered_event + ' and ' + condition.subject + ' ' + condition.operator + ' ' + condition.value
                         # condition.printConditionStruct()
                         # print("({} {} {})".format(condition.subject, condition.operator, condition.value))
                     # print("->")
-                    recovered_event = 'if ' + recovered_event[4:] + ' '
+                    recovered_event = 'if ' + recovered_event[5:] + ' '
                     recovered_action = ''
                     for action in connection[1]:
                         # action.printConditionStruct()
                         # print("({} {} {})".format(action.subject, action.operator, action.value))
-                        recovered_action = recovered_action + ' and' + action.subject + ' ' + action.operator + ' ' + action.value
+                        recovered_action = recovered_action + ' and ' + action.subject + ' ' + action.operator + ' ' + action.value
                         name = action.subject.split('.')[0]
                         conflict_devices_names.add(name)
-                    recovered_event = recovered_event + 'then ' + recovered_action[4:]
+                    recovered_event = recovered_event + 'then ' + recovered_action[5:]
                     conflict_events.append(recovered_event)
 
             if PRIORITY_TABLE[conflict_events[-1]] <= PRIORITY_TABLE[conflict_events[0]]:
@@ -93,8 +122,11 @@ if __name__ == '__main__':
                         print('ERRORS! The remedial action should never have a conflict')
                         sys.exit()
                     remedial_action_database.append(remedial_action)
+                    PRIORITY_TABLE[remedial_action] = priority
                 events_database.add(event)
-                print(remedial_action)
+                # print(remedial_action)
         else:
             event = EventNode(rule, priority)
             events_database.add(event)
+
+    generateResults(events_database, remedial_action_database)

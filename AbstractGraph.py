@@ -62,7 +62,7 @@ class ActuationGraph:
         return self.modules
 
     def getDeviceInstance(self, name):
-        return self.devices[name]
+        return self.devices[name] if name in self.devices else None
 
 def testAddChildren():
     class HvacDevice(DeviceInstance):
