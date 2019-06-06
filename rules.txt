@@ -101,12 +101,12 @@ if light.state = 1 and humidity.value >= 70 then fan.state = 1,usability
 ##########
 if light.state = 1 then fan.state = 1,usability
 if time.schedule = 1 then fan.state = 1,usability
-if humidity >= 75 then fan.state = 1,usability
+if humidity.value >= 75 then fan.state = 1,usability
 ##########
-if humidity <= 50 then fan.state = 1,usability
-if temprature.value >= 70 and outside.temp <= 65 and ac.state = 0 then fan.state = 1,usability
+if humidity.value <= 50 then fan.state = 1,usability
+if temperature.value >= 70 and outside.temp <= 65 and ac.state = 0 then fan.state = 1,usability
 ##########
-if user.home = 1 and temprature.value >= 75 then fan.state = 1,usability
+if user.home = 1 and temperature.value >= 75 then fan.state = 1,usability
 ##########
 if smoke.state = 1 then fan.state = 1,safety
 ##########
@@ -115,7 +115,7 @@ if co2.state = 1 then fireplace.state = 0,safety
 if temperature.value >= 75 then fireplace.state = 0,usability
 ##########
 if co2.state = 1 then door.state = 1,safety
-if user.home = 0 then dorr.state = 0,safety
+if user.home = 0 then door.state = 0,safety
 ##########
 if sun.state = 0 then light.state = 1,usability
 if sun.state = 1 then light.state = 0,usability
@@ -127,7 +127,7 @@ if weather.overcast = 0 then light.state = 0,usability
 ##########
 if user.sleep = 1 then light.state = 0,usability
 if user.sleep = 0 then light.state = 1,usability
-if user.home = 0 them light.state = 0,usability
+if user.home = 0 then light.state = 0,usability
 if user.home = 1 and sun.state = 0 then light.state = 1,usability
 ##########
 if lux.value <= 1000 then light.state = 1,usability

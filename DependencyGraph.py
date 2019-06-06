@@ -185,12 +185,13 @@ class DependencyGraphClass:
             pop_out_from_graph[-1].append(new_link)
             return pop_out_from_graph  # send the tuple for processing
         else:
-            if not source_is_identical:
-                self.nodes.append(source_node)
-            if not dest_is_identical:
-                self.nodes.append(dest_node)
-            source_node.outward_link.append(dest_node)
-            dest_node.inward_link.append(source_node)
+            if remove:
+                if not source_is_identical:
+                    self.nodes.append(source_node)
+                if not dest_is_identical:
+                    self.nodes.append(dest_node)
+                source_node.outward_link.append(dest_node)
+                dest_node.inward_link.append(source_node)
             return None
 
     def remove(self, a: GraphNode, b: GraphNode, remove=True):

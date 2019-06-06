@@ -19,7 +19,7 @@ class EventNode:
         self.block = block
         self.priority = priority
 
-def generateResults(events_database, remedial_action_database):
+def generateResults(events_database, remedial_action_database, total_app):
     conflict = 0
     remedial_action = 0
     blocked = 0
@@ -37,6 +37,7 @@ def generateResults(events_database, remedial_action_database):
         print('Error! Remedial events do not equal to action databse size')
 
     print('###########################################')
+    print('Total Apps: ' + str(total_app))
     print('Total Events: ' + str(total))
     print('Total Conflicts: ' + str(conflict))
     print('Blocked Events: ' + str(blocked))
@@ -49,7 +50,6 @@ def generateResults(events_database, remedial_action_database):
 if __name__ == '__main__':
     events_database = set()
     remedial_action_database = []
-    print("Please enter the rule(s)")
     dependencyGraph = DependencyGraphClass()
     evalGraph = EvalActuationGraph()
     rules = ['if user.home = 1 then door.state = 0', 'if user.home = 1 then door.state = 1']
@@ -60,9 +60,11 @@ if __name__ == '__main__':
     priority_list['default'] = PRIORITY_DEFAULT
 
     fh = open('rules.txt', 'r')
+    total_app = 0
     # for rule in sys.stdin:
     for rule in fh:
         if '##' in rule:
+            total_app += 1
             continue
         rule_raw = rule.strip()
         rule = rule_raw.split(',')[0]
@@ -71,7 +73,6 @@ if __name__ == '__main__':
         if len(rule_raw.split(',')) == 2:
             priority = priority_list[rule_raw.split(',')[1]]
 
-        print(rule)
         rule_tuple = IFTTTParser(rule, {})
         conflict = dependencyGraph.add(rule_tuple)
         PRIORITY_TABLE[rule] = priority
@@ -96,10 +97,8 @@ if __name__ == '__main__':
                         name = action.subject.split('.')[0]
                         conflict_devices_names.add(name)
                     recovered_event = recovered_event + 'then ' + recovered_action[5:]
-                    print(recovered_event + ' ================ ')
                     conflict_events.append(recovered_event)
 
-            print(conflict_events[0])
             if PRIORITY_TABLE[conflict_events[-1]] <= PRIORITY_TABLE[conflict_events[0]]:
                 for e in conflict_events[:-1]:
                     if dependencyGraph.add(IFTTTParser(e, {})):
@@ -127,12 +126,10 @@ if __name__ == '__main__':
                         print('ERRORS! The remedial action should never have a conflict')
                         sys.exit()
                     remedial_action_database.append(remedial_action)
-                    print(remedial_action+'   ############')
                     PRIORITY_TABLE[remedial_action] = priority
                 events_database.add(event)
-                # print(remedial_action)
         else:
             event = EventNode(rule, priority)
             events_database.add(event)
 
-    generateResults(events_database, remedial_action_database)
+    generateResults(events_database, remedial_action_database, total_app)
