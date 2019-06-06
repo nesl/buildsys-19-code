@@ -62,15 +62,18 @@ if __name__ == '__main__':
     fh = open('rules.txt', 'r')
     # for rule in sys.stdin:
     for rule in fh:
+        if '##' in rule:
+            continue
         rule_raw = rule.strip()
         rule = rule_raw.split(',')[0]
         priority = PRIORITY_DEFAULT
 
         if len(rule_raw.split(',')) == 2:
-            priority = priority_list(rule_raw.split(',')[1])
+            priority = priority_list[rule_raw.split(',')[1]]
 
+        print(rule)
         rule_tuple = IFTTTParser(rule, {})
-        conflict = dependencyGraph.add(rule_tuple, remove=False)
+        conflict = dependencyGraph.add(rule_tuple)
         PRIORITY_TABLE[rule] = priority
 
         if conflict is not None:
@@ -93,8 +96,10 @@ if __name__ == '__main__':
                         name = action.subject.split('.')[0]
                         conflict_devices_names.add(name)
                     recovered_event = recovered_event + 'then ' + recovered_action[5:]
+                    print(recovered_event + ' ================ ')
                     conflict_events.append(recovered_event)
 
+            print(conflict_events[0])
             if PRIORITY_TABLE[conflict_events[-1]] <= PRIORITY_TABLE[conflict_events[0]]:
                 for e in conflict_events[:-1]:
                     if dependencyGraph.add(IFTTTParser(e, {})):
@@ -122,6 +127,7 @@ if __name__ == '__main__':
                         print('ERRORS! The remedial action should never have a conflict')
                         sys.exit()
                     remedial_action_database.append(remedial_action)
+                    print(remedial_action+'   ############')
                     PRIORITY_TABLE[remedial_action] = priority
                 events_database.add(event)
                 # print(remedial_action)

@@ -1,37 +1,205 @@
+################################################
+if user.stay >= 30 then wfh.state = 1
+if wfh.state = 1 then text.state = 0
+################################################
+if temp.value >= 60 and outside.value <= 60 then windows.state = 1 and heater.state = 0,energy
+################################################
+if rain.state = 1 then text.state = 1
+if snow.state = 1 then text.state = 1
+################################################
+if temp.value <= 50 and outside.value >= 50 and windows.state = 1 then text.state = 1
+if temp.value >= 50 and outside.value <= 50 and windows.state = 1 then text.state = 1
+################################################
+if temperature.value >= 70 then ac.state = 1
+if temperature.value <= 60 then heater.state = 1
+################################################
+if user.vacation = 1 then vacation_mode.state = 1
+if vacation_mode.state = 1 and time.value <= 30 then light.state = 1
+if vacation_mode.state = 1 and time.value >= 30 then light.state = 0
+################################################
+if user_arrive_home.state = 1 then door.state = 1
+################################################
+if motion.state = 1 and user.home = 0 then text.state = 1,safety
+################################################
+if user_away.state = 1 then user_away_mode.state = 1,safety
+if user_away_mode.state = 1 then motion.state = 1,safety
+if user_away_mode.state = 1 then camera.state = 1,safety
+if user_away_mode.state = 1 then door.state = 0,safety
+if user_away_mode.state = 1 then windows.state = 0,safety
+################################################
+if motion.state = 1 then light.state = 1
+if light.state = 1 then motion.state = 0
+if motion.state = 0 then light.state = 0
+if light.state = 0 then motion.state = 1
+################################################
+if user.home = 0 then light.state = 0,energy
+if user.home = 1 then light.state = 1
+if user.home = 1 then electric_devices.state = 1
+################################################
+if multi_sensor.state = 1 then multi_sensor_switch.state = 1
+################################################
+if user.home = 0 then user_away_mode.state = 1
+if user_away_mode.state = 1 and door.state = 1 then text.state = 1,safety
+if user_away_mode.state = 1 and heater.state = 1 then text.state = 1,safety
+if user_away_mode.state = 1 and ac.state = 1 then text.state = 1,safety
+if user_away_mode.state = 1 and light.state = 1 then text.state = 1,safety
+if user_away_mode.state = 1 and windows.state = 1 then text.state = 1,safety
+if user_away_mode.state = 1 then electric_devices.state = 0,energy
+################################################
+if energy_saving.state = 1 then electric_devices.state = 0,energy
+################################################
+if alarm.state = 1 then speaker.state = 1
+################################################
+if sunrise.state = 1 then sunrise_mode.state = 1
+if sunrise_mode.state = 1 then alarm.state = 1
+if sunset.state = 1 then sunset_mode.state = 1
+if sunset_mode.state = 1 then lights.state = 1
+################################################
+if steps.value >= 10000 then text.state = 1
+if steps.value >= 10000 then lights.state = 1
+################################################
+if dangerous_detection.state = 1 then speaker.state = 1,safety
+if home_mode.state = 1 then speaker.state = 1
+if home_mode.state = 0 then speaker.state = 1
+################################################
+if lights.state = 1 then speaker.state = 1
+if motion_detection.state = 1 then speaker.state = 1
+if sunrise_mode.state = 1 then speaker.state = 1
+if sunset_mode.state = 1 then speaker.state = 1
+################################################
+if time.value = 1 then weather_value_update.state = 1
+################################################
+if fire.state = 1 then speaker.state = 1,safety
+if fire.state = 1 then text.state = 1,safety
+################################################
+if humidity.value >= 70 and outside.humidity <= 50 then windows.state = 1,usability
+if humidity.value <= 20 and outside.humidity >= 50 then windows.state = 1,usability
+##########
+if user.home = 0 then windows.state = 0,safety
+if user.sleep = 1 then windows.state = 0,safety
+if ac.state = 1 then windows.state = 0,energy
+if weather.rain = 1 then windows.state = 0,safety
+##########
+if windows.state = 0 then light.state = 1,usability
+##########
+if temperature.value >= 71 then heater.state = 0,usability
+if temperature.value <= 69 then ac.state = 0,usability
+if temperature.value >= 75 then ac.state = 1,usability
+if temperature.value <= 65 then heater.state = 1,usability
+##########
+if energy.cost >= 10000 then high_power.state = 1,energy
+if energy.cost >= 20000 then high_power.state = 1,safety
+if high_power.state = 1 then ac.state = 0,energy
+if high_power.state = 1 then heater.state = 0,energy
+##########
+if user.home = 0 then ac.state = 0,energy
+if user.home = 0 then heater.state = 1,energy
+##########
+if season.winter = 1 then heater.state = 1,safety
+##########
+if light.state = 1 and humidity.value >= 70 then fan.state = 1,usability
+##########
+if light.state = 1 then fan.state = 1,usability
+if time.schedule = 1 then fan.state = 1,usability
+if humidity >= 75 then fan.state = 1,usability
+##########
+if humidity <= 50 then fan.state = 1,usability
+if temprature.value >= 70 and outside.temp <= 65 and ac.state = 0 then fan.state = 1,usability
+##########
+if user.home = 1 and temprature.value >= 75 then fan.state = 1,usability
+##########
+if smoke.state = 1 then fan.state = 1,safety
+##########
+if temperature.value <= 60 then fireplace.state = 1,usability
+if co2.state = 1 then fireplace.state = 0,safety
+if temperature.value >= 75 then fireplace.state = 0,usability
+##########
+if co2.state = 1 then door.state = 1,safety
+if user.home = 0 then dorr.state = 0,safety
+##########
+if sun.state = 0 then light.state = 1,usability
+if sun.state = 1 then light.state = 0,usability
+##########
+if weather.rain = 1 then light.state = 1,usability
+if weather.rain = 0 then light.state = 0,usability
+if weather.overcast = 1 then light.state = 1,usability
+if weather.overcast = 0 then light.state = 0,usability
+##########
+if user.sleep = 1 then light.state = 0,usability
+if user.sleep = 0 then light.state = 1,usability
+if user.home = 0 them light.state = 0,usability
+if user.home = 1 and sun.state = 0 then light.state = 1,usability
+##########
+if lux.value <= 1000 then light.state = 1,usability
+if lux.value >= 1200 then light.state = 0,usability
+##########
+if lux.value <= 1500 then curtain.state = 1,usability
+if lux.value >= 2000 then curtain.state = 0,usability
+##########
+if user.shower = 1 then curtain.state = 0,safety
+if user.shower = 1 then light.state = 1,usability
+if user.shower = 1 then fan.state = 1,usability
+if user.shower = 1 then heater.state = 1,usability
+##########
+if time.schedule = 1 then light.state = 1,usability
+##########
+if door.lock = 0 and lux.value <= 1000 then light.state = 1,usability
+if garage.door = 1 then light.state = 1,usability
+##########
+if vibration.state = 1 then light.state = 1,usability
+if vibration.state = 1 and time.overtime = 1 then light.state = 0,usability
+##########
+if user.home = 0 then camera.state = 1,safety
+if user.home = 1 then camera.state = 0,safety
+if light.state = 0 and sun.state = 0 then camera.state = 0
+if user.shower = 1 then camera.state = 0,safety
+if user.sleep = 1 then camera.state = 0,safety
+if motion.state = 1 then camera.state = 1,safety
+##########
+if garage.door = 1 and user.home = 0 then user.home = 1
+if garage.door = 0 and motion.state = 0 then user.home = 0
+if tv.state = 1 then user.home = 1
+################################################
 if humidity.value >= 70 then fan.state = 1
 if humidity.value <= 50 then fan.state = 0
 if user.home = 1 then door.state = 0
 if light.state = 1 then door.state = 0
 if user.home = 1 then door.state = 1
+##############################################
 if door.state = 0 then light.state = 1
 if coffee.state = 1 then light.state = 1
-if user.home = 0 then light.state = 0
-if user.home = 1 then light.state = 1
-if user.home = 0 then heater.state = 1 and thermal.temp = 60
+if user.home = 0 then heater.state = 1
 if door.state = 1 then light.state = 0
+##############################################
 if co2.state = 1 then fan.state = 1
 if thermal.temp = 60 then fan.state = 0
 if gas.state = 1 then text.state = 1
+##############################################
 if humidity.value >= 70 then text.state = 1 and valve.state = 0
 if user.shower = 1 then coffee.state = 1
 if user.home = 1 then outlet.state = 1
+##############################################
 if door_jam.state = 1 then notification.state = 1
 if door.state = 0 then light.state = 1
 if humidity.value >= 50 then valve.state = 1
-if water_leakge.state = 1 then notification.state = 1
+##############################################
+if water_leakage.state = 1 then notification.state = 1
 if user.home = 0 and motion.state = 1 then notification.state = 1
 if home_mode.state = 1 then heater.state = 0 and ac.state = 0
-if temprature.value >= 70 then ac.state = 1
-if temprature.value <= 70 then heater.state = 1
+##############################################
 if user.home = 1 then mode_change.state = 1
 if user.home = 1 and door.state = 1 then light.state = 1
 if humidity.value <= 50 then valve.state = 0
 if motion.state = 1 then text.state = 1
-if user.home = 0 then window.state = 0
+##############################################
+if user.home = 0 then windows.state = 0
 if energy.cost >= 100 then high_power.state = 0
 if home_mode.state = 1 then high_power.state = 1
+##############################################
 if secure_mode.state = 1 then camera.state = 1
 if user.home = 1 then camera.state = 0
 if light.state = 1 and day.morning = 1 then speaker.state = 1
 if humidity.value <= 60 then valve.state = 1
 if water_leakage.state = 1 then valve.state = 0
+################################################
+if camera.state = 1 then lights.state = 1
