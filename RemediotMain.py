@@ -60,9 +60,32 @@ def evalNumberOfModules():
                 fh.write('\n')
 
 def evalNumberOfRemedialActions():
-    pass
+    remedial_action_number = [10, 100, 1000, 10000]
+    number_of_modules = [10, 100, 1000, 10000, 100000]
+    rule = 'if user.home = 1 then door.state = 0'
+    for module_num in number_of_modules:
+        dummy_graph = EvalActuationGraph(True, module_num)
+        dependencyGraph = DependencyGraphClass()
+        dependencyGraph.add(IFTTTParser(rule, {}))
+        for remedial_number in remedial_action_number:
+            conflict_devices = dummy_graph.graph.getDeviceInstance('door')
+            with open('results/remedial-abstraction/'
+                + 'module-'
+                + str(module_num)
+                + '-action-'
+                + str(remedial_number) + '.txt', 'a+') as fh:
+                    for i in range(0,50):
+                        time_start = time.time()
+                        for i in range(0, remedial_number):
+                            remedial_action, remedial_state = obtain_remedial_action(dummy_graph.graph, conflict_devices,
+                                dependencyGraph=dependencyGraph,
+                                conflict_condition='if user.home = 1 ')
+                        time_end = time.time()
+                        fh.write(str(round((time_end-time_start)*1000, 2)))
+                        fh.write('\n')
 
-if __name__ == '__main__':
+
+def main(fileName='rules.txt'):
     events_database = set()
     remedial_action_database = []
     dependencyGraph = DependencyGraphClass()
@@ -74,7 +97,7 @@ if __name__ == '__main__':
     priority_list['usability'] = PRIORITY_USABILITY
     priority_list['default'] = PRIORITY_DEFAULT
 
-    fh = open('rules.txt', 'r')
+    fh = open(fileName, 'r')
     total_app = 0
     # for rule in sys.stdin:
     for rule in fh:
@@ -149,3 +172,7 @@ if __name__ == '__main__':
 
     generateResults(events_database, remedial_action_database, total_app)
     # evalNumberOfModules()
+
+if __name__ == '__main__':
+    main()
+    evalNumberOfRemedialActions()

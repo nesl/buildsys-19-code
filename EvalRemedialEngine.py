@@ -311,12 +311,12 @@ class EvalActuationGraph:
         class DummyModule(Module):
             def __init__(self, name):
                 Module.__init__(self, name)
-                textUsingSmartphone = TextUsingSmartphone('warning notification')
-                warningUsingSpeaker = WarningUsingSpeaker('warning notification')
-                warningUsingLightBulbs = WarningUsingLightBulbs('warning notification')
-                super(DummyModule, self).addAbstraction(textUsingSmartphone)
-                super(DummyModule, self).addAbstraction(warningUsingSpeaker)
-                super(DummyModule, self).addAbstraction(warningUsingLightBulbs)
+                fanTurOn = FanTurnOn('dummy')
+                doorOpening = DoorOpening('dummy')
+                windowOpening = WindowOpening('dummy')
+                super(DummyModule, self).addAbstraction(fanTurOn)
+                super(DummyModule, self).addAbstraction(doorOpening)
+                super(DummyModule, self).addAbstraction(windowOpening)
 
         graphInit = ActuationGraph()
 
