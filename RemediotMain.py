@@ -4,6 +4,7 @@ from DependencyGraph import GraphNode,is_compatible_or_identical,DependencyGraph
 from AbstractGraph import *
 from EvalRemedialEngine import *
 from RemedialEngine import main as obtain_remedial_action
+import time
 
 PRIORITY_SAFETY = 0
 PRIORITY_ENERGY = 1
@@ -46,6 +47,20 @@ def generateResults(events_database, remedial_action_database, total_app):
     print('Blocked Percentage out of Conflicts: ' + str(round(float(blocked)/float(conflict)*100, 2)))
     print('Remedial Action Percentage out of Conflicts: ' + str(round(float(remedial_action)/float(conflict)*100, 2)))
     print('###########################################')
+
+def evalNumberOfModules():
+    number_of_testing = [10, 100, 1000, 10000, 100000]
+    for i in number_of_testing:
+        with open('results/' + str(i)+'.txt', 'a+') as fh:
+            for j in range(0,50):
+                time_start = time.time()
+                dummy_graph = EvalActuationGraph(True, i)
+                time_end = time.time()
+                fh.write(str(round((time_end-time_start)*1000, 2)))
+                fh.write('\n')
+
+def evalNumberOfRemedialActions():
+    pass
 
 if __name__ == '__main__':
     events_database = set()
@@ -133,3 +148,4 @@ if __name__ == '__main__':
             events_database.add(event)
 
     generateResults(events_database, remedial_action_database, total_app)
+    # evalNumberOfModules()

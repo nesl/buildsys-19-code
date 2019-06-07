@@ -12,10 +12,9 @@ ACTUATION = 1
 """
 class ActuationGraph:
 
-    modules: List[Module] = dict()
-    devices: List[DeviceInstance] = dict()
-
     def __init__ (self):
+        self.modules: List[Module] = dict()
+        self.devices: List[DeviceInstance] = dict()
         return
 
     '''
@@ -26,6 +25,7 @@ class ActuationGraph:
     '''
     def addModule(self, module):
         if module.name in self.modules.keys():
+            print(module.name)
             print('abstraction name is duplicated. Change one')
             return 1
         self.modules[module.name] = module

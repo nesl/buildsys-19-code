@@ -8,7 +8,7 @@ from Abstraction import *
 
 
 class EvalActuationGraph:
-    def __init__(self):
+    def __init__(self, performance_eval=False, number=0):
         class WindowInstance(DeviceInstance):
             def __init__(self):
                 deviceInfo = DeviceInfo("null", "null", "null", "null", "null")
@@ -308,23 +308,38 @@ class EvalActuationGraph:
                 super(WarningNotification, self).addAbstraction(warningUsingSpeaker)
                 super(WarningNotification, self).addAbstraction(warningUsingLightBulbs)
 
+        class DummyModule(Module):
+            def __init__(self, name):
+                Module.__init__(self, name)
+                textUsingSmartphone = TextUsingSmartphone('warning notification')
+                warningUsingSpeaker = WarningUsingSpeaker('warning notification')
+                warningUsingLightBulbs = WarningUsingLightBulbs('warning notification')
+                super(DummyModule, self).addAbstraction(textUsingSmartphone)
+                super(DummyModule, self).addAbstraction(warningUsingSpeaker)
+                super(DummyModule, self).addAbstraction(warningUsingLightBulbs)
+
         graphInit = ActuationGraph()
 
-        cooldDownModule = CoolDownModule()
-        heatingUpModule = HeatingUpModule()
-        ventilizationModule = VentilizationModule()
-        illuminationModule = IlluminationModule()
-        motionDetectionModule = MotionDetectionModule()
-        greenEnergyModule = GreenEnergyModule()
-        warningNotification = WarningNotification()
+        if not performance_eval:
+            cooldDownModule = CoolDownModule()
+            heatingUpModule = HeatingUpModule()
+            ventilizationModule = VentilizationModule()
+            illuminationModule = IlluminationModule()
+            motionDetectionModule = MotionDetectionModule()
+            greenEnergyModule = GreenEnergyModule()
+            warningNotification = WarningNotification()
 
-        graphInit.addModule(cooldDownModule)
-        graphInit.addModule(heatingUpModule)
-        graphInit.addModule(ventilizationModule)
-        graphInit.addModule(illuminationModule)
-        graphInit.addModule(motionDetectionModule)
-        graphInit.addModule(greenEnergyModule)
-        graphInit.addModule(warningNotification)
+            graphInit.addModule(cooldDownModule)
+            graphInit.addModule(heatingUpModule)
+            graphInit.addModule(ventilizationModule)
+            graphInit.addModule(illuminationModule)
+            graphInit.addModule(motionDetectionModule)
+            graphInit.addModule(greenEnergyModule)
+            graphInit.addModule(warningNotification)
+        else:
+            for i in range(0, number):
+                dummyModule = DummyModule(str(i))
+                graphInit.addModule(dummyModule)
 
         self.graph = graphInit
 
