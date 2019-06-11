@@ -72,7 +72,7 @@ class EvalActuationGraph:
         class SmartphoneInstance(DeviceInstance):
             def __init__(self):
                 deviceInfo = DeviceInfo("null", "null", "null", "null", "null")
-                DeviceInstance.__init__(self, True, 'smartphone', deviceInfo)
+                DeviceInstance.__init__(self, True, 'text', deviceInfo)
 
         class SpeakerInstance(DeviceInstance):
             def __init__(self):
@@ -111,7 +111,7 @@ class EvalActuationGraph:
             def performFunc(self, printState=False):
                 if printState:
                     print('text the user something')
-                return 'smartphone_text.state = 1'
+                return 'text.state = 1'
 
         class AllElectricDevicesOff(Abstraction):
             def __init__(self, moduleName):
@@ -272,26 +272,34 @@ class EvalActuationGraph:
             def __init__(self):
                 Module.__init__(self, 'cooling down')
                 acTurnOn = AirConditionerTurnOn()
-                fanTurOn = FanTurnOn('cooling down')
+                acTurnOn.updateCost(100)
+                fanTurnOn = FanTurnOn('cooling down')
+                fanTurnOn.updateCost(10)
                 windowOpening = WindowOpening('cooling down')
+                windowOpening.updateCost(1)
                 super(CoolDownModule, self).addAbstraction(acTurnOn)
-                super(CoolDownModule, self).addAbstraction(fanTurOn)
+                super(CoolDownModule, self).addAbstraction(fanTurnOn)
                 super(CoolDownModule, self).addAbstraction(windowOpening)
 
         class IncreaseHumidityModule(Module):
             def __init__(self):
                 Module.__init__(self, 'increase humidity')
                 humidifierOn = HumidifierTurnOn('increase humidity')
-                fanTurOff = FanTurnOff('increase humidity')
+                humidifierOn.updateCost(20)
+                fanTurnOff = FanTurnOff('increase humidity')
+                fanTurnOff.updateCost(1)
                 super(IncreaseHumidityModule, self).addAbstraction(humidifierOn)
-                super(IncreaseHumidityModule, self).addAbstraction(fanTurOff)
+                super(IncreaseHumidityModule, self).addAbstraction(fanTurnOff)
 
         class HeatingUpModule(Module):
             def __init__(self):
                 Module.__init__(self, 'heating up')
                 heaterTurnOn = HeaterTurnOn()
+                heaterTurnOn.updateCost(100)
                 fireplaceLightUp = FirePlaceLightUp()
+                fireplaceLightUp.updateCost(100)
                 windowOpening = WindowOpening('heating up')
+                windowOpening.updateCost(1)
                 # print('#############################')
                 # for instance in heaterTurnOn.childDeviceInstance:
                 #     print(instance.name + "=>" + self.name)
@@ -303,10 +311,13 @@ class EvalActuationGraph:
         class VentilizationModule(Module):
             def __init__(self):
                 Module.__init__(self, 'ventilization')
-                fanTurOn = FanTurnOn('ventilization')
+                fanTurnOn = FanTurnOn('ventilization')
+                fanTurnOn.updateCost(10)
                 doorOpening = DoorOpening('ventilization')
+                doorOpening.updateCost(1)
                 windowOpening = WindowOpening('ventilization')
-                super(VentilizationModule, self).addAbstraction(fanTurOn)
+                windowOpening.updateCost(1)
+                super(VentilizationModule, self).addAbstraction(fanTurnOn)
                 super(VentilizationModule, self).addAbstraction(doorOpening)
                 super(VentilizationModule, self).addAbstraction(windowOpening)
 
@@ -314,7 +325,9 @@ class EvalActuationGraph:
             def __init__(self):
                 Module.__init__(self, 'illumination')
                 lightbulbTurningOn = LightBulbTurningOn('illumination')
+                lightbulbTurningOn.updateCost(40)
                 curtainOpen = CurtainOpen('illumination')
+                curtainOpen.updateCost(1)
                 super(IlluminationModule, self).addAbstraction(lightbulbTurningOn)
                 super(IlluminationModule, self).addAbstraction(curtainOpen)
 
@@ -322,7 +335,9 @@ class EvalActuationGraph:
             def __init__(self):
                 Module.__init__(self, 'motion detection')
                 cameraMotionDetection = CameraMotionDetection('motion detection')
+                cameraMotionDetection.updateCost(40)
                 motionSensorDetection = MotionSensorDetection('motion detection')
+                motionSensorDetection.updateCost(20)
                 super(MotionDetectionModule, self).addAbstraction(cameraMotionDetection)
                 super(MotionDetectionModule, self).addAbstraction(motionSensorDetection)
 
@@ -330,7 +345,9 @@ class EvalActuationGraph:
             def __init__(self):
                 Module.__init__(self, 'enable green energy mode')
                 allElectricDevicesOff = AllElectricDevicesOff('enable green energy mode')
+                allElectricDevicesOff.updateCost(1)
                 lowPowerModeDevices = LowPowerModeDevices('enable green energy mode')
+                lowPowerModeDevices.updateCost(30)
                 super(GreenEnergyModule, self).addAbstraction(allElectricDevicesOff)
                 super(GreenEnergyModule, self).addAbstraction(lowPowerModeDevices)
 
@@ -338,8 +355,11 @@ class EvalActuationGraph:
             def __init__(self):
                 Module.__init__(self, 'warning notification')
                 textUsingSmartphone = TextUsingSmartphone('warning notification')
+                textUsingSmartphone.updateCost(5)
                 warningUsingSpeaker = WarningUsingSpeaker('warning notification')
+                warningUsingSpeaker.updateCost(20)
                 warningUsingLightBulbs = WarningUsingLightBulbs('warning notification')
+                warningUsingLightBulbs.updateCost(40)
                 super(WarningNotification, self).addAbstraction(textUsingSmartphone)
                 super(WarningNotification, self).addAbstraction(warningUsingSpeaker)
                 super(WarningNotification, self).addAbstraction(warningUsingLightBulbs)

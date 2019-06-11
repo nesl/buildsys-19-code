@@ -108,6 +108,7 @@ def main(fileName='rules.txt'):
         rule = rule_raw.split(',')[0]
         priority = PRIORITY_DEFAULT
 
+        # print(rule)
         if len(rule_raw.split(',')) == 2:
             priority = priority_list[rule_raw.split(',')[1]]
 
@@ -118,27 +119,27 @@ def main(fileName='rules.txt'):
         if conflict is not None:
             conflict_devices_names = set()
             conflict_events = []
-            print('=====================================')
+            # print('=====================================')
             for entry in conflict:  # entry is a link
                 for connection in entry: # connection is a tuple
                     recovered_event = ''
                     for condition in connection[0]:
                         recovered_event = recovered_event + ' and ' + condition.subject + ' ' + condition.operator + ' ' + condition.value
                         # condition.printConditionStruct()
-                        print("({} {} {})".format(condition.subject, condition.operator, condition.value))
-                    print("->")
+                        # print("({} {} {})".format(condition.subject, condition.operator, condition.value))
+                    # print("->")
                     recovered_event = 'if ' + recovered_event[5:] + ' '
                     recovered_action = ''
                     for action in connection[1]:
                         # action.printConditionStruct()
-                        print("({} {} {})".format(action.subject, action.operator, action.value))
+                        # print("({} {} {})".format(action.subject, action.operator, action.value))
                         recovered_action = recovered_action + ' and ' + action.subject + ' ' + action.operator + ' ' + action.value
                         name = action.subject.split('.')[0]
                         conflict_devices_names.add(name)
-                    print('----------------------------')
+                    # print('----------------------------')
                     recovered_event = recovered_event + 'then ' + recovered_action[5:]
                     conflict_events.append(recovered_event)
-            print('=====================================')
+            # print('=====================================')
 
             if PRIORITY_TABLE[conflict_events[-1]] <= PRIORITY_TABLE[conflict_events[0]]:
                 for e in conflict_events[:-1]:
@@ -154,15 +155,15 @@ def main(fileName='rules.txt'):
 
             for name in conflict_devices_names:
                 conflict_devices = evalGraph.graph.getDeviceInstance(name)
-                remedial_action, remedial_state = obtain_remedial_action(evalGraph.graph, conflict_devices, dependencyGraph=dependencyGraph, conflict_condition=rule.split('then')[0], test=False)
+                remedial_action, remedial_state = obtain_remedial_action(evalGraph.graph, conflict_devices, dependencyGraph=dependencyGraph, conflict_condition=rule.split('then')[0])
                 event = None
                 if remedial_action is None:
                     event = EventNode(rule, priority, block=True)
                 else:
                     event = EventNode(rule, priority, remedial_action_index=len(remedial_action_database))
                     remedial_action = rule.split('then')[0] + 'then ' + remedial_state
-                    print(remedial_action)
-                    print('**********************************')
+                    # print(remedial_action)
+                    # print('**********************************')
                     rule_tuple = IFTTTParser(remedial_action, {})
                     conflict = dependencyGraph.add(rule_tuple, remove=False)
                     if conflict:
@@ -175,7 +176,7 @@ def main(fileName='rules.txt'):
             event = EventNode(rule, priority)
             events_database.add(event)
 
-    # generateResults(events_database, remedial_action_database, total_app)
+    generateResults(events_database, remedial_action_database, total_app)
     # evalNumberOfModules()
 
 if __name__ == '__main__':

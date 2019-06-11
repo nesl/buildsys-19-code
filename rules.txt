@@ -203,3 +203,73 @@ if humidity.value <= 60 then valve.state = 1
 if water_leakage.state = 1 then valve.state = 0
 ################################################
 if camera.state = 1 then lights.state = 1
+################################################
+if plant.dry = 1 then tap.state = 1
+################################################
+if tap.state = 1 and time.value >= 5 then tap.state = 0
+if tap.state = 1 and time.value >= 10 then water_leakage.state = 1
+if valve.state = 0 then tap.state = 0
+################################################
+if user_movie_mode.state = 1 then tv.state = 1 and speaker.state = 1 and curtain.state = 0 and light.state = 0
+if user_movie_mode.state = 1 then tv.state = 1 and speaker.state = 0 and light.state = 1
+if tv.state = 1 then speaker.state = 1
+if tv.state = 0 then speaker.state = 0
+################################################
+if washer_ready.state = 1 then music.state = 1
+if dryer_ready.state = 1 then music.state = 1
+if coffee_ready.state = 1 then music.state = 1
+if food_ready.state = 1 then music.state = 1
+if food_burn.state = 1 then speaker.state = 1 and fan.state = 1
+################################################
+if mould.state = 1 then air_dryer.state = 1
+################################################
+if ammonia.value >= 2 then fan.state = 1
+if drain.clotted = 1 then valve.state = 0
+if user.restroom = 1 then fan.state = 1 and light.state = 1
+if user.restroom = 1 and temperature.value <= 75 then heater.state = 1
+if user.restroom = 0 then tap.state = 1
+if user.restroom = 0 and time.value >= 5 then fan.state = 0 and light.state = 0
+################################################
+if oven.state = 1 and time.value >= 120 then speaker.state = 1 and text.state = 1
+if microwave_ready.state = 1 and time.value >= 5 then speaker.state = 1 and text.state = 1
+################################################
+if user.sleep = 1 then speaker.state = 0
+if user.sleep = 1 then flashlight.state = 0
+################################################
+if day.workday = 1 and time.schedule = 1 then speaker.state = 1
+################################################
+if user.fall = 1 then text.state = 1 and speaker.state = 1
+################################################
+if user.home = 0 and phone.state = 1 then text.speaker = 1
+if door.state = 1 and key.home = 1 then speaker.state = 1
+if door.state = 1 and mobile_phone.state = 1 then speaker.state = 1
+if user.home = 1 and key.home = 0 then text.state = 1
+################################################
+if user.home = 0 and time.value >= 1000 then low__power.state = 1,energy
+if low_power.state = 1 then ac.state = 0 and heater.state = 0
+if low_power.state = 1 then light.state = 0
+if low_power.state = 1 then camera.state = 0
+if low_power.state = 1 and motion.state = 1 then low_power.state = 0
+################################################
+if user.home = 1 and weather.sun = 1 and weather.wind = 0 then window.state = 1 and curtain.state = 0
+if weather.wind = 1 then window.state = 0
+################################################
+if grass.moisture <= 15 then sprinkler.state = 1
+if grass.moisture <= 55 then sprinkler.state = 0
+if sprinkler.state = 1 and time.value >= 30 then sprinkler.state = 0
+if weather.rain = 1 then sprinkler.state = 0
+if weather.snow = 1 then sprinkler.state = 0
+if time.noon = 1 then sprinkler.state = 0
+################################################
+if ice.state = 1 then heater.state = 1
+if smoke.state = 1 then fireplace.state = 0
+if trash.full = 1 then text.state = 1
+################################################
+if sensor.battery_low = 1 then text.state = 1
+################################################
+if door.close = 1 and time.value >= 5 then door.lock = 1
+if user.home = 1 then door.lock = 1
+if door.lock = 0 and door.open = 1 then user.home = 1
+if door.lock = 0 and door.open = 1 and user.home = 1 then speaker.state = 1
+################################################
+if movement.state = 0 and time.value >= 30 then light.state = 1

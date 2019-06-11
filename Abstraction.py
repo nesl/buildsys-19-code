@@ -11,11 +11,11 @@ ACTUATION = 1
 '''
 class Abstraction:
     def __init__(self, name, moduleName, initState, type):
-        self.childAbstractions = set() # Abstraction Set using the name of string
-        self.parentAbstractions = set() # Abstraction Set using the name of string
+        self.childAbstractions = [] # Abstraction Set using the name of string
+        self.parentAbstractions = [] # Abstraction Set using the name of string
         self.cost = sys.maxsize
-        self.childDeviceInstance = set() # DeviceInstance Set
-        self.range = set()
+        self.childDeviceInstance = [] # DeviceInstance Set
+        self.range = []
         self.busy = False
         self.moduleName = moduleName
         self.name = name
@@ -56,13 +56,13 @@ class Abstraction:
             device.tagRange(range)
 
     def appendChildDeviceInstance(self, childDeviceInstance):
-        self.childDeviceInstance.add(childDeviceInstance)
+        self.childDeviceInstance.append(childDeviceInstance)
 
     def appendChildAbstraction(self,childAbstraction):
-        self.childAbstractions.add(childAbstraction)
+        self.childAbstractions.append(childAbstraction)
 
     def appendParentAbstraction(self,parentAbstraction):
-        self.parentAbstractions.add(parentAbstraction)
+        self.parentAbstractions.append(parentAbstraction)
 
     def getChildDeviceInstance(self):
         return self.childDeviceInstance
@@ -88,13 +88,13 @@ class Abstraction:
 
 class DeviceInstance:
     def __init__(self, status, name, deviceInfo):
-        self.parentAbstractions = set()
+        self.parentAbstractions = []
         self.name = name
         self.status = status # On or OFF. Or discrete value.
         self.deviceInfo = deviceInfo
 
     def addParentsInfo(self, parentModule):
-        self.parentAbstractions.add(parentModule)
+        self.parentAbstractions.append(parentModule)
 
     def removeParentsInfo(self, parentModule):
         self.parentAbstractions.remove(parentModule)

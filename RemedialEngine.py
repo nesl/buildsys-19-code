@@ -12,13 +12,17 @@ def main(actuationGraph, conflictNode, conflict_condition = None, dependencyGrap
     if not conflictNode:
         return None, None
 
-    intention = set()
+    intention = []
 
     for parent in conflictNode.parentAbstractions:
-        intention.add(parent)
+        intention.append(parent)
 
     if not intention:
         return None
+
+    print(conflict_condition)
+    intention = list(intention)
+    intention = sorted(intention)
 
     # Detect the given intention might not have any remedial actions.
     intention_candidate = []
@@ -43,11 +47,11 @@ def main(actuationGraph, conflictNode, conflict_condition = None, dependencyGrap
     selectedModule = actuationGraph.getModule(selected)
     allAbstractions = selectedModule.getAbstractionList()
 
-    remedialActions = set()
+    remedialActions = []
 
     for abstraction in allAbstractions:
         if abstraction != conflictNode and not checkConflict(selectedModule.getAbstraction(abstraction), dependencyGraph, conflict_condition):
-            remedialActions.add(abstraction)
+            remedialActions.append(abstraction)
 
     if not remedialActions:
         return None, None
@@ -68,11 +72,11 @@ def checkConflict(node, dependencyGraph, conflict_condition):
         return True
     return False
 
-#TODO: Rank the remedial actions based on their costs
 def rankActions(module, actions):
     ranked = []
     for action in actions:
         ranked.append(action)
+    ranked = sorted(ranked, reverse=True, key=lambda name:module.getAbstraction(name).cost)
     return ranked
 
 def removeActions(events, conflictList):
