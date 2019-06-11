@@ -20,7 +20,7 @@ def main(actuationGraph, conflictNode, conflict_condition = None, dependencyGrap
     if not intention:
         return None
 
-    print(conflict_condition)
+    # print(conflict_condition)
     intention = list(intention)
     intention = sorted(intention)
 
@@ -81,14 +81,6 @@ def rankActions(module, actions):
 
 def removeActions(events, conflictList):
     return events
-
-def groupEvents(events):
-    grouped = dict()
-    for event in events:
-        if not grouped[event.label]:
-            grouped[event.label] = list()
-        grouped[event.label].append(event)
-    return grouped
 
 def testRemdedialEngine():
     class HvacDevice(DeviceInstance):

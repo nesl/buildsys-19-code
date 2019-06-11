@@ -117,7 +117,7 @@ def main(fileName='rules.txt'):
         PRIORITY_TABLE[rule] = priority
 
         if conflict is not None:
-            conflict_devices_names = set()
+            conflict_devices_names = []
             conflict_events = []
             # print('=====================================')
             for entry in conflict:  # entry is a link
@@ -135,7 +135,8 @@ def main(fileName='rules.txt'):
                         # print("({} {} {})".format(action.subject, action.operator, action.value))
                         recovered_action = recovered_action + ' and ' + action.subject + ' ' + action.operator + ' ' + action.value
                         name = action.subject.split('.')[0]
-                        conflict_devices_names.add(name)
+                        if name not in conflict_devices_names:
+                            conflict_devices_names.append(name)
                     # print('----------------------------')
                     recovered_event = recovered_event + 'then ' + recovered_action[5:]
                     conflict_events.append(recovered_event)
@@ -146,12 +147,12 @@ def main(fileName='rules.txt'):
                     if dependencyGraph.add(IFTTTParser(e, {})):
                         print('THERE ARE ERRORS IN THE ALGORITHM!!!!!')
                         sys.exit()
-                    conflict_devices_names = list(conflict_devices_names)[-1:]
+                    conflict_devices_names = conflict_devices_names[-1:]
             else:
                 if dependencyGraph.add(IFTTTParser(conflict_events[-1], {})):
                     print('THERE ARE ERRORS IN THE ALGORITHM!!!!!')
                     sys.exit()
-                conflict_devices_names = list(conflict_devices_names)[:-1]
+                conflict_devices_names = conflict_devices_names[:-1]
 
             for name in conflict_devices_names:
                 conflict_devices = evalGraph.graph.getDeviceInstance(name)
