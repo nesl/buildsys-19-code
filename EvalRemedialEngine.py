@@ -64,6 +64,11 @@ class EvalActuationGraph:
                 deviceInfo = DeviceInfo("null", "null", "null", "null", "null")
                 DeviceInstance.__init__(self, True, 'electric_devices', deviceInfo)
 
+        class HumidifierDeviceInstance(DeviceInstance):
+            def __init__(self):
+                deviceInfo = DeviceInfo("null", "null", "null", "null", "null")
+                DeviceInstance.__init__(self, True, 'humudifier', deviceInfo)
+
         class SmartphoneInstance(DeviceInstance):
             def __init__(self):
                 deviceInfo = DeviceInfo("null", "null", "null", "null", "null")
@@ -218,6 +223,18 @@ class EvalActuationGraph:
                     print('Turning on the HVAC now')
                 return 'ac.state = 1'
 
+        class HumidifierTurnOn(Abstraction):
+            def __init__(self, name):
+                Abstraction.__init__(self, 'turn on humidifier', name, 0, ACTUATION)
+                humidifierInstance = HumidifierDeviceInstance()
+                super(HumidifierTurnOn, self).appendChildDeviceInstance(humidifierInstance)
+
+            def performFunc(self, printState=False):
+                if printState:
+                    print('Turning on the humidifier now')
+                return 'humidifier.state = 1'
+
+
         class WindowOpening(Abstraction):
             def __init__(self, moduleName):
                 Abstraction.__init__(self, 'open the window', moduleName, 0, ACTUATION)
@@ -240,6 +257,17 @@ class EvalActuationGraph:
                     print('Turning on the fan now')
                 return 'fan.state = 1'
 
+        class FanTurnOff(Abstraction):
+            def __init__(self, moduleName):
+                Abstraction.__init__(self, 'turn off fan', moduleName, 0, ACTUATION)
+                fanInstance = FanInstance()
+                super(FanTurnOff, self).appendChildDeviceInstance(fanInstance)
+
+            def performFunc(self, printState=False):
+                if printState:
+                    print('Turning off the fan now')
+                return 'fan.state = 0'
+
         class CoolDownModule(Module):
             def __init__(self):
                 Module.__init__(self, 'cooling down')
@@ -249,6 +277,14 @@ class EvalActuationGraph:
                 super(CoolDownModule, self).addAbstraction(acTurnOn)
                 super(CoolDownModule, self).addAbstraction(fanTurOn)
                 super(CoolDownModule, self).addAbstraction(windowOpening)
+
+        class IncreaseHumidityModule(Module):
+            def __init__(self):
+                Module.__init__(self, 'increase humidity')
+                humidifierOn = HumidifierTurnOn('increase humidity')
+                fanTurOff = FanTurnOff('increase humidity')
+                super(IncreaseHumidityModule, self).addAbstraction(humidifierOn)
+                super(IncreaseHumidityModule, self).addAbstraction(fanTurOff)
 
         class HeatingUpModule(Module):
             def __init__(self):
@@ -328,6 +364,7 @@ class EvalActuationGraph:
             motionDetectionModule = MotionDetectionModule()
             greenEnergyModule = GreenEnergyModule()
             warningNotification = WarningNotification()
+            increaseHumidityModule = IncreaseHumidityModule()
 
             graphInit.addModule(cooldDownModule)
             graphInit.addModule(heatingUpModule)
@@ -336,6 +373,7 @@ class EvalActuationGraph:
             graphInit.addModule(motionDetectionModule)
             graphInit.addModule(greenEnergyModule)
             graphInit.addModule(warningNotification)
+            graphInit.addModule(increaseHumidityModule)
         else:
             for i in range(0, number):
                 dummyModule = DummyModule(str(i))

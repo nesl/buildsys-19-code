@@ -2,7 +2,13 @@
 if user.stay >= 30 then wfh.state = 1
 if wfh.state = 1 then text.state = 0
 ################################################
-if temp.value >= 60 and outside.value <= 60 then windows.state = 1 and heater.state = 0,energy
+if user_away.state = 1 then user_away_mode.state = 1,safety
+if user_away_mode.state = 1 then motion.state = 1,safety
+if user_away_mode.state = 1 then camera.state = 1,safety
+if user_away_mode.state = 1 then door.state = 0,safety
+if user_away_mode.state = 1 then windows.state = 0,safety
+################################################
+if temp.value >= 60 and outside.value <= 60 then windows.state = 1,energy
 ################################################
 if rain.state = 1 then text.state = 1
 if snow.state = 1 then text.state = 1
@@ -20,12 +26,6 @@ if vacation_mode.state = 1 and time.value >= 30 then light.state = 0
 if user_arrive_home.state = 1 then door.state = 1
 ################################################
 if motion.state = 1 and user.home = 0 then text.state = 1,safety
-################################################
-if user_away.state = 1 then user_away_mode.state = 1,safety
-if user_away_mode.state = 1 then motion.state = 1,safety
-if user_away_mode.state = 1 then camera.state = 1,safety
-if user_away_mode.state = 1 then door.state = 0,safety
-if user_away_mode.state = 1 then windows.state = 0,safety
 ################################################
 if motion.state = 1 then light.state = 1
 if light.state = 1 then motion.state = 0
