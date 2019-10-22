@@ -15,8 +15,8 @@ python RemediotMain.py
 The results might not be consistent for each run, because we randomize it for
 performance issue. But it should not vary significantly.
 
-To generate figure 6 and 7, you need to modify the rules.txt such that the
-conflicting can happen many times. Run:
+To generate figure 6 and 7, you need to uncomment evalNumberOfRemedialActions()
+in RemediotMain.py and run:
 python RemediotMain.py conflict_rules.txt
 
 The raw measurement data are stored in:
